@@ -1,4 +1,4 @@
-# KumuluzEE Config
+# KumuluzEE Streaming
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-streaming/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-streaming)
 
 > Event streaming extensions for the lightweight Kumuluz EE framework.
