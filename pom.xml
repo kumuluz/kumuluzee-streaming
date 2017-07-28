@@ -8,6 +8,7 @@
     <artifactId>kumuluzee-streaming</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <modules>
+        <module>common</module>
         <module>kafka</module>
     </modules>
     <packaging>pom</packaging>
@@ -26,7 +27,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <kumuluzee.version>2.3.0-beta.2</kumuluzee.version>
+        <kumuluzee.version>2.3.0-SNAPSHOT</kumuluzee.version>
 
         <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
@@ -75,6 +76,11 @@
                 <version>${kumuluzee.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.kumuluz.ee.streaming</groupId>
+                <artifactId>kumuluzee-streaming-common</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -9,34 +9,18 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <name>KumuluzEE Streaming Kafka</name>
-    <description>KumuluzEE Streaming extension with Kafka</description>
+    <name>KumuluzEE Streaming Common</name>
+    <description>KumuluzEE Streaming Common module</description>
 
-    <artifactId>kumuluzee-streaming-kafka</artifactId>
+    <artifactId>kumuluzee-streaming-common</artifactId>
 
-    <properties>
-        <kafka-clients.version>0.11.0.0</kafka-clients.version>
-    </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>com.kumuluz.ee</groupId>
             <artifactId>kumuluzee-cdi-weld</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.kumuluz.ee.streaming</groupId>
-            <artifactId>kumuluzee-streaming-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>${kafka-clients.version}</version>
-        </dependency>
-
     </dependencies>
 
 </project>
