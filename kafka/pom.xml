@@ -15,7 +15,7 @@
     <artifactId>kumuluzee-streaming-kafka</artifactId>
 
     <properties>
-        <kafka-clients.version>0.11.0.0</kafka-clients.version>
+        <kafka-clients.version>1.0.0</kafka-clients.version>
     </properties>
 
     <dependencies>

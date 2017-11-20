@@ -27,7 +27,7 @@ import com.kumuluz.ee.common.config.EeConfig;
 import com.kumuluz.ee.common.dependencies.EeComponentDependency;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
-import com.kumuluz.ee.common.dependencies.EeExtensionType;
+import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 
 import java.util.logging.Logger;
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author Matija Kljun
  */
-@EeExtensionDef(name = "kafka", type = EeExtensionType.STREAMING)
+@EeExtensionDef(name = "kafka", group = EeExtensionGroup.STREAMING)
 @EeComponentDependency(EeComponentType.CDI)
 public class KafkaExtension implements Extension {
 
