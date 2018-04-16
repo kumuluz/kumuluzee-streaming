@@ -1,9 +1,9 @@
 # KumuluzEE Event Streaming
 [![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-streaming/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-streaming)
 
-> KumuluzEE Event Streaming extension for developing event-based microservices using Apache Kafka.
+> KumuluzEE Event Streaming project for developing event-based microservices using Apache Kafka.
 
-KumuluzEE Event Streaming extension for the KumuluzEE microservice framework provides easy-to-use annotations for developing microservices that produce or consume event streams. KumuluzEE Event Streaming has been designed to support modularity with pluggable streaming platforms. Currently, [Apache Kafka](https://kafka.apache.org/) is supported. In the future, other event streaming platforms will be supported too (contributions are welcome).
+KumuluzEE Event Streaming project for the KumuluzEE microservice framework provides easy-to-use annotations for developing microservices that produce or consume event streams. KumuluzEE Event Streaming has been designed to support modularity with pluggable streaming platforms. Currently, [Apache Kafka](https://kafka.apache.org/) is supported. In the future, other event streaming platforms will be supported too (contributions are welcome).
 
 ## Usage
 
@@ -35,7 +35,7 @@ For more information about KumuluzEE Logs visit the [KumuluzEE Logs Github page]
 
 #### Configuring Kafka Producers and Consumers
 
-Kafka Consumers and Producers are configured with the common KumuluzEE configuration framework. Configuration properties can be defined with the environment variables or with the configuration files. Alternatively, they can also be stored in a configuration server, such as etcd or Consul (for which the KumuluzEE Config extension is required). For more details see the [KumuluzEE configuration wiki page](https://github.com/kumuluz/kumuluzee/wiki/Configuration) and [KumuluzEE Config](https://github.com/kumuluz/kumuluzee-config).
+Kafka Consumers and Producers are configured with the common KumuluzEE configuration framework. Configuration properties can be defined with the environment variables or with the configuration files. Alternatively, they can also be stored in a configuration server, such as etcd or Consul (for which the KumuluzEE Config project is required). For more details see the [KumuluzEE configuration wiki page](https://github.com/kumuluz/kumuluzee/wiki/Configuration) and [KumuluzEE Config](https://github.com/kumuluz/kumuluzee-config).
 The default configuration prefix for consumers is `consumer`, for producers is `producer`, but you can assign your custom configuration prefix. This way you can configure several different producers and/or consumers at the same time.
 
 The example below shows a sample configuration for the Kafka producer and consumer using default prefix.
