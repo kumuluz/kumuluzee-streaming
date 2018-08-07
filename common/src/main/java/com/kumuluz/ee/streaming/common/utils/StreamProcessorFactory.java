@@ -19,38 +19,12 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.kafka.utils;
-
-import com.kumuluz.ee.streaming.common.utils.ProducerFactory;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.common.config.ConfigException;
-
-import javax.enterprise.context.RequestScoped;
-import java.util.Map;
-import java.util.logging.Logger;
+package com.kumuluz.ee.streaming.common.utils;
 
 /**
  * @author Matija Kljun
  */
-@RequestScoped
-public class KafkaProducerFactory implements ProducerFactory<Producer> {
+public interface StreamProcessorFactory <T> {
 
-    static Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());
-
-    @Override
-    public Producer createProducer(Map<String, Object> producerConfig) {
-
-        Producer producer = null;
-
-        try {
-            producer = new KafkaProducer(producerConfig);
-            log.info("Created Kafka Producer.");
-        } catch (ConfigException e) {
-            log.severe("Producer config exception: " + e.toString());
-        }
-
-        return producer;
-    }
-
+    T createStreamProcessor();
 }

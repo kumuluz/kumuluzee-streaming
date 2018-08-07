@@ -19,7 +19,7 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.kafka.utils;
+package com.kumuluz.ee.streaming.kafka.utils.producer;
 
 import com.kumuluz.ee.streaming.common.annotations.StreamProducer;
 import com.kumuluz.ee.streaming.kafka.config.KafkaProducerConfigLoader;

@@ -19,7 +19,7 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.kafka.utils;
+package com.kumuluz.ee.streaming.kafka.utils.consumer;
 
 import com.kumuluz.ee.streaming.common.utils.ConsumerFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaConsumerConfigLoader;
@@ -41,9 +41,11 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
     @Override
     public ConsumerRunnable createConsumer(Object instance,
                                            String configName,
+                                           String groupId,
                                            String[] topics,
                                            Method method,
-                                           boolean batchListener) {
+                                           boolean batchListener,
+                                           Class<?> listenerClass) {
 
         if (topics.length == 0) {
             topics = new String[1];
@@ -51,6 +53,10 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
         }
 
         Map<String, Object> consumerConfig = KafkaConsumerConfigLoader.getConfig(configName);
+
+        if(!groupId.equals("")) {
+            consumerConfig.put("group.id", groupId);
+        }
 
         if (batchListener && !method.getParameterTypes()[0].isAssignableFrom(List.class)) {
 
@@ -69,7 +75,7 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
 
         } else {
 
-            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener);
+            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener, listenerClass);
         }
 
         return null;

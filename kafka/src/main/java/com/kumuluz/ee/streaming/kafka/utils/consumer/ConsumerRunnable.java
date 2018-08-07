@@ -19,19 +19,18 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.kafka.utils;
+package com.kumuluz.ee.streaming.kafka.utils.consumer;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.InvalidTopicException;
 import org.apache.kafka.common.errors.WakeupException;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,17 +50,19 @@ public class ConsumerRunnable implements Runnable {
     private long pollTimeout;
     private boolean batchListener;
     private Object instance;
+    private Class<?> listenerClass;
 
     private static final Logger log = Logger.getLogger(ConsumerRunnable.class.getName());
 
     public ConsumerRunnable(Object instance, Map<String, Object> consumerConfig, List<String> topics, Method method,
-                            boolean batchListener) {
+                            boolean batchListener, Class<?> listenerClass) {
 
         this.topics = topics;
         this.method = method;
         this.consumerConfig = consumerConfig;
         this.batchListener = batchListener;
         this.instance = instance;
+        this.listenerClass = listenerClass;
 
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
         try {
@@ -89,7 +90,19 @@ public class ConsumerRunnable implements Runnable {
 
         try {
 
-            consumer.subscribe(topics);
+            if (this.listenerClass != null) {
+                try {
+                    Constructor<?> ctor = this.listenerClass.getConstructor(KafkaConsumer.class);
+
+                    Object object = ctor.newInstance(new Object[]{consumer});
+                    ConsumerRebalanceListener listener = (ConsumerRebalanceListener) object;
+
+                    consumer.subscribe(topics, listener);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    log.severe(e.getMessage());
+                }
+            } else
+                consumer.subscribe(topics);
 
             while (true) {
                 try {

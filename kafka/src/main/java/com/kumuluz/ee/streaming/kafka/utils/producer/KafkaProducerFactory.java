@@ -19,26 +19,38 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.kafka.utils;
+package com.kumuluz.ee.streaming.kafka.utils.producer;
 
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.common.TopicPartition;
+import com.kumuluz.ee.streaming.common.utils.ProducerFactory;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.common.config.ConfigException;
+
+import javax.enterprise.context.RequestScoped;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @author Matija Kljun
  */
-public class Acknowledgement {
-    private ConsumerRunnable consumer;
+@RequestScoped
+public class KafkaProducerFactory implements ProducerFactory<Producer> {
 
-    public Acknowledgement(ConsumerRunnable consumer) {
-        this.consumer = consumer;
+    static Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());
+
+    @Override
+    public Producer createProducer(Map<String, Object> producerConfig) {
+
+        Producer producer = null;
+
+        try {
+            producer = new KafkaProducer(producerConfig);
+            log.info("Created Kafka Producer.");
+        } catch (ConfigException e) {
+            log.severe("Producer config exception: " + e.toString());
+        }
+
+        return producer;
     }
 
-    public void acknowledge() {
-        consumer.ack();
-    }
-
-    public void acknowledge(java.util.Map<TopicPartition, OffsetAndMetadata> offsets) {
-        consumer.ack(offsets);
-    }
 }

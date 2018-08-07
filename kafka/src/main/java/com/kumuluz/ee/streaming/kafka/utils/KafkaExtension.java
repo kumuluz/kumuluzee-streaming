@@ -45,7 +45,7 @@ public class KafkaExtension implements Extension {
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
-        log.info("Initialising Kafka extension.");
+        log.info("Initialising Kumuluz Streaming extension.");
     }
 
     @Override

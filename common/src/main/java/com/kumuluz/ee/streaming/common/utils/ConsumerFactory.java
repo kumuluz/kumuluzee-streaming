@@ -27,5 +27,5 @@ import java.lang.reflect.Method;
  * @author Matija Kljun
  */
 public interface ConsumerFactory<T> {
-    T createConsumer(Object instance, String configName, String[] topics, Method method, boolean batchListener);
+    T createConsumer(Object instance, String configName, String groupId, String[] topics, Method method, boolean batchListener, Class<?> clazz);
 }

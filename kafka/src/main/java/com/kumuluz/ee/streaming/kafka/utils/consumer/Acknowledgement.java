@@ -19,29 +19,26 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.common.annotations;
+package com.kumuluz.ee.streaming.kafka.utils.consumer;
 
-import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.common.TopicPartition;
 
 /**
  * @author Matija Kljun
  */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface StreamListener {
+public class Acknowledgement {
+    private ConsumerRunnable consumer;
 
-    @Nonbinding String groupId() default "";
+    public Acknowledgement(ConsumerRunnable consumer) {
+        this.consumer = consumer;
+    }
 
-    @Nonbinding String config() default "consumer";
+    public void acknowledge() {
+        consumer.ack();
+    }
 
-    @Nonbinding String[] topics() default {};
-
-    @Nonbinding boolean batchListener() default false;
+    public void acknowledge(java.util.Map<TopicPartition, OffsetAndMetadata> offsets) {
+        consumer.ack(offsets);
+    }
 }
-

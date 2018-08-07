@@ -19,48 +19,21 @@
  *  limitations under the License.
 */
 
-package com.kumuluz.ee.streaming.common.utils;
+package com.kumuluz.ee.streaming.common.annotations;
 
-import com.kumuluz.ee.streaming.common.annotations.StreamListener;
-
-import javax.enterprise.inject.spi.Bean;
-import java.lang.reflect.Method;
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Matija Kljun
  */
-public class ListenerInstance {
-    private Bean bean;
-    private Method method;
-    private StreamListener annotation;
-
-    public ListenerInstance(Bean bean, Method method, StreamListener annotation) {
-        this.bean = bean;
-        this.method = method;
-        this.annotation = annotation;
-    }
-
-    public Bean getBean() {
-        return bean;
-    }
-
-    public void setBean(Bean bean) {
-        this.bean = bean;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
-    }
-
-    public StreamListener getAnnotation() {
-        return annotation;
-    }
-
-    public void setAnnotation(StreamListener annotation) {
-        this.annotation = annotation;
-    }
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface StreamProcessorController {
+    @Nonbinding String id();
 }

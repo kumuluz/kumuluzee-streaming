@@ -21,36 +21,60 @@
 
 package com.kumuluz.ee.streaming.common.utils;
 
-import com.kumuluz.ee.streaming.common.annotations.StreamListener;
-
-import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.inject.spi.Bean;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Matija Kljun
  */
-public interface ConsumerInitializerExtension extends Extension {
+public class AnnotatedInstance<T> {
+    private Bean bean;
+    private Method method;
+    private T annotation;
 
-    List<AnnotatedInstance<StreamListener>> instanceList = new ArrayList<>();
+    private Class clazz;
 
-    default <X> void processStreamListeners(@Observes ProcessBean<X> pat) {
-
-        for (Method method : pat.getBean().getBeanClass().getMethods()) {
-            if (method.getAnnotation(StreamListener.class) != null) {
-
-                StreamListener annotation = method.getAnnotation(StreamListener.class);
-
-                instanceList.add(new AnnotatedInstance<>(pat.getBean(), method, annotation));
-            }
-        }
+    public AnnotatedInstance(Bean bean, Method method, T annotation) {
+        this.bean = bean;
+        this.method = method;
+        this.annotation = annotation;
     }
 
-    <X> void after(@Observes AfterDeploymentValidation adv, BeanManager bm);
+    public AnnotatedInstance(Class clazz, Method method, T annotation) {
+        this.method = method;
+        this.annotation = annotation;
+        this.clazz = clazz;
+    }
 
+    public Bean getBean() {
+        return bean;
+    }
+
+    public void setBean(Bean bean) {
+        this.bean = bean;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public T getAnnotation() {
+        return annotation;
+    }
+
+    public void setAnnotation(T annotation) {
+        this.annotation = annotation;
+    }
+
+    public Class getClazz() {
+        return clazz;
+    }
+
+    public void setClazz(Class clazz) {
+        this.clazz = clazz;
+    }
 }

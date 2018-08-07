@@ -33,15 +33,13 @@ import java.lang.annotation.Target;
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface StreamListener {
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface StreamProcessor {
 
-    @Nonbinding String groupId() default "";
+    @Nonbinding String id();
 
-    @Nonbinding String config() default "consumer";
+    @Nonbinding String config() default "streams";
 
-    @Nonbinding String[] topics() default {};
+    @Nonbinding boolean autoStart() default true;
 
-    @Nonbinding boolean batchListener() default false;
 }
-
