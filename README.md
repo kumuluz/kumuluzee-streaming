@@ -177,6 +177,8 @@ annotated method, which has two methods for committing the message offsets:
 * `acknowledge(java.util.Map<TopicPartition,OffsetAndMetadata> offsets)` that commits the specified offsets for the 
 specified list of topics and partitions
 
+Example of manual message commiting:
+
 ```java
 @StreamListener(topics = {"topic"})
 public void onMessage(ConsumerRecord<String, String> record, Acknowledgement ack) {
