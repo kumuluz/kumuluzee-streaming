@@ -142,6 +142,7 @@ The annotation takes three parameters:
 - `topics` an array of topics names, if none is defined the name of the annotated method will be used as a topic name. 
 - `config` is the configuration prefix name for the KumuluzEE configuration. The default value is `consumer`.
 - `batchListener` a boolean value, for enabling batch message consuming. The default value is `false`.
+
 The example shows a @StreamListener annotated topicName method with default configuration prefix name:
 
 ```java
