@@ -17,7 +17,7 @@
 
     <inceptionYear>2017</inceptionYear>
     <description>
-        Event streaming extensions for the lightweight Kumuluz EE framework.
+        Event streaming extensions for the lightweight KumuluzEE framework.
     </description>
 
     <url>https://ee.kumuluz.com</url>
@@ -27,7 +27,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <kumuluzee.version>2.5.0-SNAPSHOT</kumuluzee.version>
+        <kumuluzee.version>2.5.3</kumuluzee.version>
+
+        <kafka-clients.version>1.0.0</kafka-clients.version>
+        <kafka-streams.version>1.0.0</kafka-streams.version>
 
         <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
         <gpg.plugin.version>1.6</gpg.plugin.version>
@@ -80,7 +83,7 @@
             <dependency>
                 <groupId>com.kumuluz.ee.streaming</groupId>
                 <artifactId>kumuluzee-streaming-common</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
