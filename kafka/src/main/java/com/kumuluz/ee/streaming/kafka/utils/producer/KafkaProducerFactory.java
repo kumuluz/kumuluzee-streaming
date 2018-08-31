@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 @RequestScoped
 public class KafkaProducerFactory implements ProducerFactory<Producer> {
 
-    static Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());
+    private static final Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());
 
     @Override
     public Producer createProducer(Map<String, Object> producerConfig) {
