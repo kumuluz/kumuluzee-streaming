@@ -33,6 +33,7 @@ import org.apache.kafka.streams.state.StreamsMetadata;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,12 +43,8 @@ public class StreamsController {
 
     private KafkaStreams streams;
 
-    public StreamsController() {
-
-    }
-
-    public void setStreams(Topology builder, StreamsConfig streamsConfig) {
-        this.streams = new KafkaStreams(builder, streamsConfig);
+    public void setStreams(Topology builder, Properties properties) {
+        this.streams = new KafkaStreams(builder, properties);
     }
 
     public void start() {
@@ -76,10 +73,6 @@ public class StreamsController {
 
     public String toString() {
         return this.streams.toString();
-    }
-
-    public String toString(String indent) {
-        return this.streams.toString(indent);
     }
 
     public void cleanUp() {

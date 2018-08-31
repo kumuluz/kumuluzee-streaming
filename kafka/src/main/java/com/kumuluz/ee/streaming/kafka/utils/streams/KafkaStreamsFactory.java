@@ -21,13 +21,14 @@
 
 package com.kumuluz.ee.streaming.kafka.utils.streams;
 
+import com.kumuluz.ee.streaming.common.config.ConfigLoader;
 import com.kumuluz.ee.streaming.common.utils.StreamProcessorFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaStreamsConfigLoader;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 
 import java.lang.reflect.Method;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -50,7 +51,7 @@ public class KafkaStreamsFactory implements StreamProcessorFactory<StreamsContro
                                                 boolean autoStart) {
 
 
-        StreamsConfig streamsConfig = new StreamsConfig(KafkaStreamsConfigLoader.getConfig(configName));
+        Properties streamsConfig = ConfigLoader.asProperties(KafkaStreamsConfigLoader.getConfig(configName));
 
         if (method.getParameterCount() > 0) {
             log.severe("StreamProcessor annotated method { " + method.getName() + " } shouldn't have any parameters!");

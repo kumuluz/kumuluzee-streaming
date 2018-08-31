@@ -26,6 +26,7 @@ import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -39,7 +40,7 @@ public interface ConfigLoader {
     static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix) {
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
 
-        Map<String, Object> prop = new HashMap<String, Object>();
+        Map<String, Object> prop = new HashMap<>();
         while (configProps.hasNext()) {
             try {
                 String configProp = configProps.next();
@@ -52,5 +53,17 @@ public interface ConfigLoader {
             }
         }
         return prop;
+    }
+
+    static Properties asProperties(Map<String, Object> config) {
+        Properties properties = new Properties();
+
+        config.forEach((key, value) -> {
+            if (value instanceof String) {
+                properties.setProperty(key, (String) value);
+            }
+        });
+
+        return properties;
     }
 }
