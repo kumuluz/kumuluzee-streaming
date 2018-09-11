@@ -94,7 +94,7 @@ public class ConsumerRunnable implements Runnable {
                 try {
                     Constructor<?> ctor = this.listenerClass.getConstructor(KafkaConsumer.class);
 
-                    Object object = ctor.newInstance(new Object[]{consumer});
+                    Object object = ctor.newInstance(consumer);
                     ConsumerRebalanceListener listener = (ConsumerRebalanceListener) object;
 
                     consumer.subscribe(topics, listener);
@@ -142,7 +142,7 @@ public class ConsumerRunnable implements Runnable {
                                         method.getParameterCount() > 1) {
                                     Acknowledgement ack = new Acknowledgement(this);
 
-                                    method.invoke(instance, (ConsumerRecord) recordsIterator.next(), ack);
+                                    method.invoke(instance, recordsIterator.next(), ack);
                                 } else {
                                     method.invoke(instance, (ConsumerRecord) recordsIterator.next());
                                 }

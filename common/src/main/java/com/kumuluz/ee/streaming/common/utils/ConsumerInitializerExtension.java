@@ -51,6 +51,6 @@ public interface ConsumerInitializerExtension extends Extension {
         }
     }
 
-    <X> void after(@Observes AfterDeploymentValidation adv, BeanManager bm);
+    void after(@Observes AfterDeploymentValidation adv, BeanManager bm);
 
 }

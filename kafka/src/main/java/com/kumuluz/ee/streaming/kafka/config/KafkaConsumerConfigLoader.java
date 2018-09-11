@@ -29,7 +29,7 @@ import java.util.Map;
 /**
  * @author Matija Kljun
  */
-public class KafkaConsumerConfigLoader implements ConfigLoader {
+public class KafkaConsumerConfigLoader {
 
     private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
 

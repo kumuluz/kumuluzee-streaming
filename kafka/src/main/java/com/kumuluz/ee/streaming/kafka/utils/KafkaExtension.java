@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  *
  * @author Matija Kljun
  */
-@EeExtensionDef(name = "kafka", group = EeExtensionGroup.STREAMING)
+@EeExtensionDef(name = "Kafka", group = EeExtensionGroup.STREAMING)
 @EeComponentDependency(EeComponentType.CDI)
 public class KafkaExtension implements Extension {
 

@@ -32,12 +32,11 @@ import java.util.logging.Logger;
 /**
  * @author Matija Kljun
  */
-public interface ConfigLoader {
+public class ConfigLoader {
 
-    Logger log = Logger.getLogger(ConfigLoader.class.getName());
+    private static final Logger log = Logger.getLogger(ConfigLoader.class.getName());
 
-
-    static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix) {
+    public static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix) {
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
 
         Map<String, Object> prop = new HashMap<>();
@@ -55,7 +54,7 @@ public interface ConfigLoader {
         return prop;
     }
 
-    static Properties asProperties(Map<String, Object> config) {
+    public static Properties asProperties(Map<String, Object> config) {
         Properties properties = new Properties();
 
         config.forEach((key, value) -> {

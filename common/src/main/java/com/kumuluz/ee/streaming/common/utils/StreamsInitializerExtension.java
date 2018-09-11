@@ -31,7 +31,7 @@ public interface StreamsInitializerExtension extends Extension {
 
     <X> void processAnnotatedTypes(@Observes ProcessAnnotatedType<X> pat);
 
-    <X> void afterTypeDiscovery(@Observes AfterTypeDiscovery atd, BeanManager bm);
+    void afterTypeDiscovery(@Observes AfterTypeDiscovery atd, BeanManager bm);
 
     <T> void processInjectionTarget(final @Observes ProcessInjectionTarget<T> pit);
 }

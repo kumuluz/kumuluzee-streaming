@@ -61,7 +61,7 @@ public class KafkaStreamsInitializerExtension implements StreamsInitializerExten
         }
     }
 
-    public <X> void afterTypeDiscovery(@Observes AfterTypeDiscovery atd, BeanManager bm) {
+    public void afterTypeDiscovery(@Observes AfterTypeDiscovery atd, BeanManager bm) {
 
         if (instanceList.size() > 0) {
 

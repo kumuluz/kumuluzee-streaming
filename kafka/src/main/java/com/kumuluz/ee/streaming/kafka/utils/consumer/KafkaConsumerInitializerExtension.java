@@ -42,15 +42,13 @@ public class KafkaConsumerInitializerExtension implements ConsumerInitializerExt
 
     private static final Logger log = Logger.getLogger(KafkaConsumerInitializerExtension.class.getName());
 
-    ConsumerFactory<ConsumerRunnable> kafkaConsumerFactory;
+    public void after(@Observes AfterDeploymentValidation adv, BeanManager bm) {
 
-    public <X> void after(@Observes AfterDeploymentValidation adv, BeanManager bm) {
+        ConsumerFactory<ConsumerRunnable> kafkaConsumerFactory = new KafkaConsumerFactory();
 
-        kafkaConsumerFactory = new KafkaConsumerFactory();
-
-        // TODO remove this ?
-        for (AnnotatedInstance inst : instanceList)
-            System.out.println(inst.getMethod().getName());
+        for (AnnotatedInstance inst : instanceList) {
+            log.fine("Found consumer method " + inst.getMethod().getName() + " in class " + inst.getMethod().getDeclaringClass());
+        }
 
         if (instanceList.size() > 0) {
             ExecutorService executor = Executors.newFixedThreadPool(instanceList.size());
@@ -65,29 +63,24 @@ public class KafkaConsumerInitializerExtension implements ConsumerInitializerExt
                 String configName = annotation.config();
                 boolean batchListener = annotation.batchListener();
 
-                Class<?> consumerRebalanceListener = null;
-
                 Object instance = bm.getReference(inst.getBean(), method.getDeclaringClass(), bm
                         .createCreationalContext(inst.getBean()));
 
                 ConsumerRunnable consumer = kafkaConsumerFactory.createConsumer(instance, configName, groupId, topics, method,
-                        batchListener, consumerRebalanceListener);
+                        batchListener, null);
 
                 if (consumer != null) {
                     executor.submit(consumer);
 
-                    Runtime.getRuntime().addShutdownHook(new Thread() {
-                        @Override
-                        public void run() {
-                            consumer.shutdown();
-                            executor.shutdown();
-                            try {
-                                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        consumer.shutdown();
+                        executor.shutdown();
+                        try {
+                            executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    });
+                    }));
                 }
             }
         }
