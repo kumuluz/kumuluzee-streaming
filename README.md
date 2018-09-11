@@ -177,7 +177,7 @@ annotated method, which has two methods for committing the message offsets:
 * `acknowledge(java.util.Map<TopicPartition,OffsetAndMetadata> offsets)` that commits the specified offsets for the 
 specified list of topics and partitions
 
-Example of manual message commiting:
+Example of manual message committing:
 
 ```java
 @StreamListener(topics = {"topic"})
@@ -187,7 +187,45 @@ public void onMessage(ConsumerRecord<String, String> record, Acknowledgement ack
 	// commit the message record
 	ack.acknowledge();
 }
-``` 
+```
+
+### Stream processing
+
+KumuluzEE Event Streaming with Kafka supports stream processors. `@StreamProcessor` annotation is used for building a
+stream processor.
+
+Example of stream processor:
+
+```java
+@StreamProcessor(id = "word-count", autoStart = false)
+public StreamsBuilder wordCountBuilder() {
+
+    StreamsBuilder builder = new StreamsBuilder();
+
+    // configure the builder
+
+    return builder;
+
+}
+```
+
+`@StreamProcessor` annotation has several parameters. The `config` parameter specifies the prefix used for configuration
+lookup, similar to the one used by `@StreamProducer` and `@StreamListener` annotations described above. The `autoStart`
+parameter allows automatic or manual initiation of the stream processor.
+
+If the `autoStart` parameter is set to `false`, a `StreamsController` can be used to control the lifecycle of
+the stream processor. `@StreamProcessorController` is used to obtain an instance of `StreamsController`.
+
+Example usage of `StreamsController`:
+
+```java
+@StreamProcessorController(id="word-count")
+StreamsController wordCountStreams;
+
+public void startStream(@Observes @Initialized(ApplicationScoped.class) Object init) {
+    wordCountStreams.start();
+}
+```
 
 ## Changelog
 
