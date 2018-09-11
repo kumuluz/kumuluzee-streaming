@@ -25,7 +25,10 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.*;
 
 /**
+ * CDI extension for stream processors.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public interface StreamsInitializerExtension extends Extension {
 

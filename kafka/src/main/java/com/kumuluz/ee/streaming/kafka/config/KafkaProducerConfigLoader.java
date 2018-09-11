@@ -27,7 +27,10 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import java.util.Map;
 
 /**
+ * Config loader for Kafka producer.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaProducerConfigLoader {
 

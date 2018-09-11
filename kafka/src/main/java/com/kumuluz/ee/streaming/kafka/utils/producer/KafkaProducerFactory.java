@@ -31,7 +31,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
+ * Factory for Kafka producers.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 @RequestScoped
 public class KafkaProducerFactory implements ProducerFactory<Producer> {

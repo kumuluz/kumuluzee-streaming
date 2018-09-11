@@ -25,7 +25,10 @@ import javax.enterprise.inject.spi.Bean;
 import java.lang.reflect.Method;
 
 /**
+ * Represents an annotated method in a bean.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class AnnotatedInstance<T> {
     private Bean bean;

@@ -36,7 +36,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 /**
+ * CDI extension for consumer method initialization.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaConsumerInitializerExtension implements ConsumerInitializerExtension {
 

@@ -24,7 +24,10 @@ package com.kumuluz.ee.streaming.common.utils;
 import java.util.Map;
 
 /**
+ * Stream producer factory.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public interface ProducerFactory<T> {
     T createProducer(Map<String, Object> producerConfig);

@@ -32,7 +32,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
+ * Implementation of consumer factory for Kafka.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
 

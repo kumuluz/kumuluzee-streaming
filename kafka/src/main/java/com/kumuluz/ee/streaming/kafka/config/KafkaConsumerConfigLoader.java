@@ -27,7 +27,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import java.util.Map;
 
 /**
+ * Config loader for Kafka consumer.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaConsumerConfigLoader {
 

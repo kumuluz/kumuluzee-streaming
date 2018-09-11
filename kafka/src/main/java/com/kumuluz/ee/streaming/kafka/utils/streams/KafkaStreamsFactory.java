@@ -32,7 +32,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
+ * Factory for Kafka stream processors.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaStreamsFactory implements StreamProcessorFactory<StreamsController> {
 

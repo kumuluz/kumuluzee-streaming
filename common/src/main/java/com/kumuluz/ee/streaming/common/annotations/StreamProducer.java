@@ -29,7 +29,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Injects a producer instance.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

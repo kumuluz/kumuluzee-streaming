@@ -22,7 +22,10 @@
 package com.kumuluz.ee.streaming.common.utils;
 
 /**
+ * Stream processor factory.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public interface StreamProcessorFactory <T> {
 

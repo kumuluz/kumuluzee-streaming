@@ -37,7 +37,10 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Kafka streams controller.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class StreamsController {
 

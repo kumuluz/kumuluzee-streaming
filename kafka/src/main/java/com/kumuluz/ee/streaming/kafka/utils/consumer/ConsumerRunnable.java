@@ -39,7 +39,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
+ * Runnable for Kafka consumers.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class ConsumerRunnable implements Runnable {
 

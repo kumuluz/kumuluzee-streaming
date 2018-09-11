@@ -6,7 +6,10 @@ import org.apache.kafka.streams.StreamsConfig;
 import java.util.Map;
 
 /**
+ * Config loader for Kafka streams.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaStreamsConfigLoader {
 

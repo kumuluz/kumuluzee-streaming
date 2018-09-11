@@ -36,6 +36,7 @@ import java.util.logging.Logger;
  * KumuluzEE framework extension for Apache Kafka
  *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 @EeExtensionDef(name = "Kafka", group = EeExtensionGroup.STREAMING)
 @EeComponentDependency(EeComponentType.CDI)

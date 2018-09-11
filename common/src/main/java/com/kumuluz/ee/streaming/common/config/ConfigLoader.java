@@ -30,7 +30,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
+ * Utility methods for processing configuration.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class ConfigLoader {
 

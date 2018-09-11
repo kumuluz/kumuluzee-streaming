@@ -35,7 +35,10 @@ import java.util.*;
 import java.util.logging.Logger;
 
 /**
+ * CDI extension for processing Kafka stream processor methods.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class KafkaStreamsInitializerExtension implements StreamsInitializerExtension {
 

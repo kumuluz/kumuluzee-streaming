@@ -25,7 +25,10 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 
 /**
+ * Kafka message acknowledgement.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public class Acknowledgement {
     private ConsumerRunnable consumer;

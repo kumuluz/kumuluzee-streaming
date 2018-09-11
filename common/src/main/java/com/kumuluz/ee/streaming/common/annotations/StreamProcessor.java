@@ -29,7 +29,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Marks method as streams processor builder.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)

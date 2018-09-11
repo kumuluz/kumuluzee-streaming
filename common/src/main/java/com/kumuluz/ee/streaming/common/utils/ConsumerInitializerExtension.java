@@ -33,7 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * CDI extension for consumer initialization.
+ *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 public interface ConsumerInitializerExtension extends Extension {
 

@@ -31,7 +31,7 @@ If you would like to collect Kafka related logs through the KumuluzEE Logs, you 
 </dependency>
 ```
 You also need to include a Log4j2 configuration, which should be in a file named `log4j2.xml`, located in `src/main/resources`. \
-For more information about KumuluzEE Logs visit the [KumuluzEE Logs Github page](https://github.com/kumuluz/kumuluzee-logs). \
+For more information about KumuluzEE Logs visit the [KumuluzEE Logs Github page](https://github.com/kumuluz/kumuluzee-logs).
 
 #### Configuring Kafka Producers and Consumers
 

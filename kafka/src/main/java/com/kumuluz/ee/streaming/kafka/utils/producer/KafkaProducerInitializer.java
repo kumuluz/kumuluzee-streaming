@@ -36,6 +36,7 @@ import java.util.Map;
  * Producer for KafkaProducer annotation.
  *
  * @author Matija Kljun
+ * @since 1.0.0
  */
 @ApplicationScoped
 public class KafkaProducerInitializer {
