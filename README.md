@@ -21,13 +21,13 @@ If you would like to collect Kafka related logs through the KumuluzEE Logs, you 
 <dependency>
     <artifactId>kumuluzee-logs-log4j2</artifactId>
     <groupId>com.kumuluz.ee.logs</groupId>
-    <version>1.1.0</version>
+    <version>${kumuluzee-logs.version}</version>
 </dependency>
 
 <dependency>
     <groupId>org.apache.logging.log4j</groupId>
     <artifactId>log4j-slf4j-impl</artifactId>
-    <version>2.8.1</version>
+    <version>${log4j-slf4j-impl.version}</version>
 </dependency>
 ```
 You also need to include a Log4j2 configuration, which should be in a file named `log4j2.xml`, located in `src/main/resources`. \
