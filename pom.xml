@@ -6,7 +6,7 @@
 
     <groupId>com.kumuluz.ee.streaming</groupId>
     <artifactId>kumuluzee-streaming</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <modules>
         <module>common</module>
         <module>kafka</module>
@@ -55,6 +55,18 @@
             <id>tfaga</id>
             <email>tilen.faganel@me.com</email>
             <url>https://github.com/TFaga</url>
+        </developer>
+        <developer>
+            <name>Matija Kljun</name>
+            <id>matijaklj</id>
+            <email>matija.kljun@cloud.si</email>
+            <url>https://github.com/matijaklj</url>
+        </developer>
+        <developer>
+            <name>Urban Malc</name>
+            <id>urbim</id>
+            <email>urban.malc@cloud.si </email>
+            <url>https://github.com/urbim</url>
         </developer>
     </developers>
 
