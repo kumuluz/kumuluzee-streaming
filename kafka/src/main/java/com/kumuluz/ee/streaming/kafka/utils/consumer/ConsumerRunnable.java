@@ -32,10 +32,9 @@ import org.apache.kafka.common.errors.WakeupException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -46,11 +45,15 @@ import java.util.logging.Logger;
  */
 public class ConsumerRunnable implements Runnable {
 
+    private static final long POLL_TIMEOUT_DEFAULT = 2000;
+    private static final int MAX_RETRIES_BEFORE_REBALANCE_DEFAULT = 3;
+
     private KafkaConsumer consumer;
     private final List<String> topics;
     private final Method method;
     private Map<String, Object> consumerConfig;
     private long pollTimeout;
+    private int maxRetriesBeforeRebalance;
     private boolean batchListener;
     private Object instance;
     private Class<?> listenerClass;
@@ -68,76 +71,59 @@ public class ConsumerRunnable implements Runnable {
         this.listenerClass = listenerClass;
 
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
-        try {
-            if (confUtil.get("kumuluzee.streaming.kafka.poll-timeout").isPresent())
-                pollTimeout = Long.parseLong(confUtil.get("kumuluzee.streaming.kafka.poll-timeout").get());
-            else pollTimeout = Long.MAX_VALUE;
-        } catch (Exception e) {
-            log.warning("Incorrect value of poll-timeout in configuration: " + e.toString());
-            pollTimeout = Long.MAX_VALUE;
-        }
+        if (confUtil.getLong("kumuluzee.streaming.kafka.poll-timeout").isPresent())
+            pollTimeout = confUtil.getLong("kumuluzee.streaming.kafka.poll-timeout").get();
+        else pollTimeout = POLL_TIMEOUT_DEFAULT;
+        if (confUtil.getInteger("kumuluzee.streaming.kafka.max-retries-before-rebalance").isPresent())
+            maxRetriesBeforeRebalance = confUtil.getInteger("kumuluzee.streaming.kafka.max-retries-before-rebalance").get();
+        else maxRetriesBeforeRebalance = MAX_RETRIES_BEFORE_REBALANCE_DEFAULT;
     }
 
     @Override
     public void run() {
 
-        try {
-            this.consumer = new KafkaConsumer<>(consumerConfig);
-        } catch (ConfigException e) {
-            log.severe("Consumer config exception: " + e.toString());
-        } catch (KafkaException e) {
-            log.severe("Kafka exception: " + e.toString());
-        } catch (Exception e) {
-            log.severe("Failed to initialize Consumer: " + e.toString());
-        }
+        while (true) {
+            try {
+                this.consumer = new KafkaConsumer<>(consumerConfig);
+            } catch (ConfigException e) {
+                log.severe("Consumer config exception: " + e.toString());
+            } catch (KafkaException e) {
+                log.severe("Kafka exception: " + e.toString());
+            } catch (Exception e) {
+                log.severe("Failed to initialize Consumer: " + e.toString());
+            }
 
-        try {
+            try {
 
-            if (this.listenerClass != null) {
-                try {
-                    Constructor<?> ctor = this.listenerClass.getConstructor(KafkaConsumer.class);
+                if (this.listenerClass != null) {
+                    try {
+                        Constructor<?> ctor = this.listenerClass.getConstructor(KafkaConsumer.class);
 
-                    Object object = ctor.newInstance(consumer);
-                    ConsumerRebalanceListener listener = (ConsumerRebalanceListener) object;
+                        Object object = ctor.newInstance(consumer);
+                        ConsumerRebalanceListener listener = (ConsumerRebalanceListener) object;
 
-                    consumer.subscribe(topics, listener);
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                    log.severe(e.getMessage());
-                }
-            } else
-                consumer.subscribe(topics);
+                        consumer.subscribe(topics, listener);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                        log.severe(e.getMessage());
+                    }
+                } else
+                    consumer.subscribe(topics);
 
-            while (true) {
-                try {
+                int retries = 0;
+                while (true) {
+                    try {
 
-                    ConsumerRecords records = consumer.poll(pollTimeout);
+                        ConsumerRecords<?, ?> records = consumer.poll(Duration.of(pollTimeout, ChronoUnit.MILLIS));
 
-                    Iterator<ConsumerRecord> recordsIterator = records.iterator();
+                        Iterator<? extends ConsumerRecord<?, ?>> recordsIterator = records.iterator();
 
-                    if (batchListener) {
+                        Map<TopicPartition, Long> nacks = new HashMap<>();
 
-                        List<ConsumerRecord> consumerRecordsList = new ArrayList<>();
-                        recordsIterator.forEachRemaining(consumerRecordsList::add);
+                        if (batchListener) {
 
-                        try {
+                            List<ConsumerRecord> consumerRecordsList = new ArrayList<>();
+                            recordsIterator.forEachRemaining(consumerRecordsList::add);
 
-                            if (consumerConfig.get("enable.auto.commit") != null &&
-                                    consumerConfig.get("enable.auto.commit").equals("false") &&
-                                    method.getParameterCount() > 1) {
-                                Acknowledgement ack = new Acknowledgement(this);
-
-                                method.invoke(instance, consumerRecordsList, ack);
-                            } else {
-                                method.invoke(instance, consumerRecordsList);
-                            }
-
-                        } catch (Exception e) {
-
-                            log.warning("Error at invoking consumer method: " + e.toString() + e.getCause());
-
-                        }
-                    } else {
-                        while (recordsIterator.hasNext()) {
                             try {
 
                                 if (consumerConfig.get("enable.auto.commit") != null &&
@@ -145,9 +131,32 @@ public class ConsumerRunnable implements Runnable {
                                         method.getParameterCount() > 1) {
                                     Acknowledgement ack = new Acknowledgement(this);
 
-                                    method.invoke(instance, recordsIterator.next(), ack);
+                                    method.invoke(instance, consumerRecordsList, ack);
+
+                                    if (!ack.isAcknowledged()) {
+                                        // may be partly acknowledged, check if correctly
+                                        Map<TopicPartition, Long> maxOffsets = new HashMap<>();
+                                        Map<TopicPartition, Long> minOffsets = new HashMap<>();
+                                        records.forEach(cr -> {
+                                            TopicPartition tp = new TopicPartition(cr.topic(), cr.partition());
+                                            maxOffsets.compute(tp, (key, value) ->
+                                                    (value == null) ? cr.offset() : Long.max(value, cr.offset()));
+                                            minOffsets.compute(tp, (key, value) ->
+                                                    (value == null) ? cr.offset() : Long.min(value, cr.offset()));
+                                        });
+
+                                        Map<TopicPartition, Long> ackedPartitions = ack.getAcknowledgedPartitions();
+
+                                        for (TopicPartition tp : maxOffsets.keySet()) {
+                                            if (!ackedPartitions.containsKey(tp)) {
+                                                nacks.put(tp, minOffsets.get(tp));
+                                            } else if (ackedPartitions.get(tp) < maxOffsets.get(tp) + 1) {
+                                                nacks.put(tp, ackedPartitions.get(tp) - 1);
+                                            }
+                                        }
+                                    }
                                 } else {
-                                    method.invoke(instance, (ConsumerRecord) recordsIterator.next());
+                                    method.invoke(instance, consumerRecordsList);
                                 }
 
                             } catch (Exception e) {
@@ -155,39 +164,84 @@ public class ConsumerRunnable implements Runnable {
                                 log.warning("Error at invoking consumer method: " + e.toString() + e.getCause());
 
                             }
+                        } else {
+
+                            while (recordsIterator.hasNext()) {
+                                try {
+
+                                    if (consumerConfig.get("enable.auto.commit") != null &&
+                                            consumerConfig.get("enable.auto.commit").equals("false") &&
+                                            method.getParameterCount() > 1) {
+                                        ConsumerRecord<?, ?> record = recordsIterator.next();
+                                        TopicPartition tp = new TopicPartition(record.topic(), record.partition());
+
+                                        if (nacks.containsKey(tp)) {
+                                            log.warning("Previous message from " + tp + " has not been acknowledged." +
+                                                    " Skipping next message in the same partition.");
+                                            continue;
+                                        }
+
+                                        OffsetAndMetadata oam = new OffsetAndMetadata(record.offset() + 1,
+                                                record.leaderEpoch(),
+                                                "");
+                                        Acknowledgement ack = new Acknowledgement(this, tp, oam);
+
+                                        method.invoke(instance, record, ack);
+
+                                        if (!ack.isAcknowledged()) {
+                                            nacks.put(tp, record.offset());
+                                        }
+                                    } else {
+                                        method.invoke(instance, (ConsumerRecord) recordsIterator.next());
+                                    }
+
+                                } catch (Exception e) {
+
+                                    log.warning("Error at invoking consumer method: " + e.toString() + e.getCause());
+
+                                }
+                            }
+
                         }
+
+                        for (Map.Entry<TopicPartition, Long> entry : nacks.entrySet()) {
+                            consumer.seek(entry.getKey(), entry.getValue());
+                        }
+                        if (!nacks.isEmpty()) {
+                            if (retries >= maxRetriesBeforeRebalance) {
+                                log.warning("Max retries reached, trying to rebalance.");
+                                break;
+                            }
+
+                            retries++;
+                            log.warning("Nacks occurred. Waiting before retrying read. Retry attempt: " + retries);
+                            Thread.sleep(this.pollTimeout);
+                        } else {
+                            retries = 0;
+                        }
+
+                    } catch (Exception e) {
+                        log.warning(e.toString());
+                        break;
                     }
-
-
-                } catch (Exception e) {
-                    log.warning(e.toString());
-                    break;
                 }
+            } catch (InvalidTopicException e) {
+                log.warning(e.toString());
+            } catch (WakeupException e) {
+                // ignore for shutdown
+                break;
+            } finally {
+                consumer.close();
             }
-        } catch (InvalidTopicException e) {
-            log.warning(e.toString());
-        } catch (WakeupException e) {
-            // ignore for shutdown
-        } finally {
-            consumer.close();
         }
     }
 
     public void ack() {
-        try {
-            consumer.commitSync();
-        } catch (Exception e) {
-            log.warning(e.toString());
-        }
-
+        consumer.commitSync();
     }
 
     public void ack(Map<TopicPartition, OffsetAndMetadata> offsets) {
-        try {
-            consumer.commitSync(offsets);
-        } catch (Exception e) {
-            log.warning(e.toString());
-        }
+        consumer.commitSync(offsets);
     }
 
     public void shutdown() {

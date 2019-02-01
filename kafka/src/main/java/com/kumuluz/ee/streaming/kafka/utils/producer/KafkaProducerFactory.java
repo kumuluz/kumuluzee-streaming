@@ -26,7 +26,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.config.ConfigException;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * @author Matija Kljun
  * @since 1.0.0
  */
-@RequestScoped
+@ApplicationScoped
 public class KafkaProducerFactory implements ProducerFactory<Producer> {
 
     private static final Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());

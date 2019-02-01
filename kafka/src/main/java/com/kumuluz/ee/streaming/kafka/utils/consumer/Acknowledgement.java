@@ -24,6 +24,10 @@ package com.kumuluz.ee.streaming.kafka.utils.consumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Kafka message acknowledgement.
  *
@@ -31,17 +35,55 @@ import org.apache.kafka.common.TopicPartition;
  * @since 1.0.0
  */
 public class Acknowledgement {
+
     private ConsumerRunnable consumer;
+    private TopicPartition tp;
+    private OffsetAndMetadata oam;
+    private boolean acknowledged;
+    private boolean batch;
+
+    private Map<TopicPartition, Long> acknowledgedPartitions;
 
     public Acknowledgement(ConsumerRunnable consumer) {
+        this(consumer, null, null);
+    }
+
+    public Acknowledgement(ConsumerRunnable consumer, TopicPartition tp, OffsetAndMetadata oam) {
         this.consumer = consumer;
+        this.tp = tp;
+        this.oam = oam;
+        this.acknowledged = false;
+        this.batch = tp == null && oam == null;
+
+        if (batch) {
+            this.acknowledgedPartitions = new HashMap<>();
+        }
     }
 
     public void acknowledge() {
-        consumer.ack();
+        if (!batch) {
+            consumer.ack(Collections.singletonMap(tp, oam));
+        } else {
+            consumer.ack();
+        }
+        this.acknowledged = true;
     }
 
     public void acknowledge(java.util.Map<TopicPartition, OffsetAndMetadata> offsets) {
+        if (!batch) {
+            throw new IllegalStateException("This method can only be used when using batch message consuming");
+        }
         consumer.ack(offsets);
+        offsets.forEach((tp, oam) ->
+                acknowledgedPartitions.compute(tp, (k, v) ->
+                        (v == null) ? oam.offset() : Long.max(oam.offset(), v)));
+    }
+
+    public boolean isAcknowledged() {
+        return acknowledged;
+    }
+
+    public Map<TopicPartition, Long> getAcknowledgedPartitions() {
+        return acknowledgedPartitions;
     }
 }
