@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.streaming.kafka.utils.consumer;
 
+import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.utils.ConsumerFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaConsumerConfigLoader;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -48,14 +49,15 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
                                            String[] topics,
                                            Method method,
                                            boolean batchListener,
-                                           Class<?> listenerClass) {
+                                           Class<?> listenerClass,
+                                           ConfigurationOverride[] overrides) {
 
         if (topics.length == 0) {
             topics = new String[1];
             topics[0] = method.getName();
         }
 
-        Map<String, Object> consumerConfig = KafkaConsumerConfigLoader.getConfig(configName);
+        Map<String, Object> consumerConfig = KafkaConsumerConfigLoader.getConfig(configName, overrides);
 
         if(!groupId.equals("")) {
             consumerConfig.put("group.id", groupId);

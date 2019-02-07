@@ -17,28 +17,22 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
-
+ */
 package com.kumuluz.ee.streaming.common.annotations;
 
-import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
- * Injects a producer instance.
+ * Overrides Kafka configuration property.
  *
- * @author Matija Kljun
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.1.0
  */
-@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
-public @interface StreamProducer {
-    @Nonbinding String config() default "producer";
+public @interface ConfigurationOverride {
 
-    @Nonbinding ConfigurationOverride[] configOverrides() default {};
+    String key();
+
+    String value();
 }

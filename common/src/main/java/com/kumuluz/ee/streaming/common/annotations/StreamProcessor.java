@@ -45,4 +45,5 @@ public @interface StreamProcessor {
 
     @Nonbinding boolean autoStart() default true;
 
+    @Nonbinding ConfigurationOverride[] configOverrides() default {};
 }

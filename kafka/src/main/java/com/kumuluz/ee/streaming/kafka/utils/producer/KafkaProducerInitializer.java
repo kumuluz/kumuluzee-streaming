@@ -50,7 +50,8 @@ public class KafkaProducerInitializer {
     @StreamProducer
     public Producer getProducer(InjectionPoint injectionPoint) {
 
-        String config = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class).config();
+        StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
+        String config = annotation.config();
 
         if (producers.containsKey(config)) {
 
@@ -60,7 +61,8 @@ public class KafkaProducerInitializer {
                 return producer;
 
         } else {
-            Producer producer = kafkaProducerFactory.createProducer(KafkaProducerConfigLoader.getConfig(config));
+            Producer producer = kafkaProducerFactory.createProducer(KafkaProducerConfigLoader.getConfig(config,
+                    annotation.configOverrides()));
             producers.put(config, producer);
 
             if (producer != null)

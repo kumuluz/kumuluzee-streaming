@@ -22,6 +22,7 @@
 package com.kumuluz.ee.streaming.common.config;
 
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
+import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,15 +40,28 @@ public class ConfigLoader {
 
     private static final Logger log = Logger.getLogger(ConfigLoader.class.getName());
 
-    public static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix) {
+    public static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix,
+                                                ConfigurationOverride[] overrides) {
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
+
+        Map<String, String> overridesMap = new HashMap<>();
+
+        if (overrides != null) {
+            for (ConfigurationOverride override : overrides) {
+                overridesMap.put(override.key(), override.value());
+            }
+        }
 
         Map<String, Object> prop = new HashMap<>();
         while (configProps.hasNext()) {
             try {
                 String configProp = configProps.next();
-                String configName = configPrefix + "." + configProp.replace('.', '-');
-                if (confUtil.get(configName).isPresent()) {
+                String configPropKumuluz = configProp.replace('.', '-');
+                String configName = configPrefix + "." + configPropKumuluz;
+
+                if (overridesMap.containsKey(configPropKumuluz)) {
+                    prop.put(configProp, overridesMap.get(configPropKumuluz));
+                } else if (confUtil.get(configName).isPresent()) {
                     prop.put(configProp, confUtil.get(configName).get());
                 }
             } catch (Exception e) {

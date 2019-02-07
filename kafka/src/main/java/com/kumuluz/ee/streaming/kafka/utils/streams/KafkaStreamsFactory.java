@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.streaming.kafka.utils.streams;
 
+import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.config.ConfigLoader;
 import com.kumuluz.ee.streaming.common.utils.StreamProcessorFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaStreamsConfigLoader;
@@ -47,14 +48,15 @@ public class KafkaStreamsFactory implements StreamProcessorFactory<StreamsContro
     }
 
     public void setStreamProcessor(StreamsController sb,
-                                                Object instance,
-                                                String configName,
-                                                Method method,
-                                                String id,
-                                                boolean autoStart) {
+                                   Object instance,
+                                   String configName,
+                                   Method method,
+                                   String id,
+                                   boolean autoStart,
+                                   ConfigurationOverride[] overrides) {
 
 
-        Properties streamsConfig = ConfigLoader.asProperties(KafkaStreamsConfigLoader.getConfig(configName));
+        Properties streamsConfig = ConfigLoader.asProperties(KafkaStreamsConfigLoader.getConfig(configName, overrides));
 
         if (method.getParameterCount() > 0) {
             log.severe("StreamProcessor annotated method { " + method.getName() + " } shouldn't have any parameters!");

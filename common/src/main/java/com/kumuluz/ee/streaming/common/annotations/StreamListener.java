@@ -46,5 +46,7 @@ public @interface StreamListener {
     @Nonbinding String[] topics() default {};
 
     @Nonbinding boolean batchListener() default false;
+
+    @Nonbinding ConfigurationOverride[] configOverrides() default {};
 }
 

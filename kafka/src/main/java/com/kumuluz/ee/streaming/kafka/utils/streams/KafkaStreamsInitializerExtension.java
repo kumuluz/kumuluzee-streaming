@@ -198,7 +198,8 @@ public class KafkaStreamsInitializerExtension implements StreamsInitializerExten
 
                     Object instance = CDI.current().select(inst.getClazz()).get();
 
-                    kafkaStreamsFactory.setStreamProcessor(sb, instance, configName, method, id, autoStart);
+                    kafkaStreamsFactory.setStreamProcessor(sb, instance, configName, method, id, autoStart,
+                            annotation.configOverrides());
 
                     log.info("Kafka Streams start");
                 }
