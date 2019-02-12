@@ -18,7 +18,7 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
 
 package com.kumuluz.ee.streaming.kafka.utils;
 
@@ -29,7 +29,9 @@ import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -51,5 +53,17 @@ public class KafkaExtension implements Extension {
 
     @Override
     public void load() {
+    }
+
+    @Override
+    public boolean isEnabled() {
+
+        Optional<Boolean> isEnabled = ConfigurationUtil.getInstance().getBoolean("kumuluzee.streaming.kafka.enabled");
+
+        if (isEnabled.isPresent() && isEnabled.get() == false) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
