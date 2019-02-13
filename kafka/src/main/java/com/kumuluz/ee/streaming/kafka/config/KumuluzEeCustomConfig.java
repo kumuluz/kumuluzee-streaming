@@ -17,36 +17,27 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
-
+ */
 package com.kumuluz.ee.streaming.kafka.config;
 
-import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
-import com.kumuluz.ee.streaming.common.config.ConfigLoader;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Config loader for Kafka producer.
+ * Custom configuration keys for Kafka producer/consumer.
  *
- * @author Matija Kljun
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-public class KafkaProducerConfigLoader {
+public class KumuluzEeCustomConfig {
 
-    private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
+    public static final String KEY_DESERIALIZER_TYPE = "key.deserializer.type";
+    public static final String VALUE_DESERIALIZER_TYPE = "value.deserializer.type";
+    public static final String DESERIALIZER_TYPE = "deserializer.type";
 
-    public static Map<String, Object> getConfig(String configName, ConfigurationOverride[] overrides) {
-        List<String> configNames = new LinkedList<>();
-        ProducerConfig.configNames().iterator().forEachRemaining(configNames::add);
-        configNames.addAll(KumuluzEeCustomConfig.getCustomConfigs());
-
-        return ConfigLoader.getConfig(configNames,
-                CONFIG_PREFIX + "." + configName,
-                overrides);
+    public static List<String> getCustomConfigs() {
+        return Stream.of(KEY_DESERIALIZER_TYPE, VALUE_DESERIALIZER_TYPE, DESERIALIZER_TYPE)
+                .collect(Collectors.toList());
     }
-
 }

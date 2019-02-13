@@ -17,36 +17,24 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
+package com.kumuluz.ee.streaming.kafka.serdes;
 
-package com.kumuluz.ee.streaming.kafka.config;
-
-import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
-import com.kumuluz.ee.streaming.common.config.ConfigLoader;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import org.apache.kafka.common.serialization.Serde;
 
 /**
- * Config loader for Kafka producer.
+ * Collection of Kumuluz SerDes for Kafka streams.
  *
- * @author Matija Kljun
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-public class KafkaProducerConfigLoader {
+public class KumuluzSerdes {
 
-    private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
-
-    public static Map<String, Object> getConfig(String configName, ConfigurationOverride[] overrides) {
-        List<String> configNames = new LinkedList<>();
-        ProducerConfig.configNames().iterator().forEachRemaining(configNames::add);
-        configNames.addAll(KumuluzEeCustomConfig.getCustomConfigs());
-
-        return ConfigLoader.getConfig(configNames,
-                CONFIG_PREFIX + "." + configName,
-                overrides);
+    public static <T> Serde<T> JsonSerde() {
+        return new JsonSerde<>();
     }
 
+    public static <T> Serde<T> JsonSerde(Class<T> type) {
+        return new JsonSerde<>(type);
+    }
 }

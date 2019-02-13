@@ -24,10 +24,7 @@ package com.kumuluz.ee.streaming.common.config;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -40,7 +37,7 @@ public class ConfigLoader {
 
     private static final Logger log = Logger.getLogger(ConfigLoader.class.getName());
 
-    public static Map<String, Object> getConfig(Iterator<String> configProps, String configPrefix,
+    public static Map<String, Object> getConfig(List<String> configProps, String configPrefix,
                                                 ConfigurationOverride[] overrides) {
         ConfigurationUtil confUtil = ConfigurationUtil.getInstance();
 
@@ -53,9 +50,8 @@ public class ConfigLoader {
         }
 
         Map<String, Object> prop = new HashMap<>();
-        while (configProps.hasNext()) {
+        for (String configProp : configProps) {
             try {
-                String configProp = configProps.next();
                 String configPropKumuluz = configProp.replace('.', '-');
                 String configName = configPrefix + "." + configPropKumuluz;
 

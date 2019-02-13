@@ -17,36 +17,42 @@
  *  out of or in connection with the software or the use or other dealings in the
  *  software. See the License for the specific language governing permissions and
  *  limitations under the License.
-*/
+ */
+package com.kumuluz.ee.streaming.kafka.serdes;
 
-package com.kumuluz.ee.streaming.kafka.config;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.common.errors.SerializationException;
+import org.apache.kafka.common.serialization.Serializer;
 
-import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
-import com.kumuluz.ee.streaming.common.config.ConfigLoader;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Config loader for Kafka producer.
+ * Json serializer for Kafka.
  *
- * @author Matija Kljun
- * @since 1.0.0
+ * @author Urban Malc
+ * @since 1.2.0
  */
-public class KafkaProducerConfigLoader {
+public class JsonSerializer<T> implements Serializer<T> {
 
-    private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
+    private ObjectMapper objectMapper;
 
-    public static Map<String, Object> getConfig(String configName, ConfigurationOverride[] overrides) {
-        List<String> configNames = new LinkedList<>();
-        ProducerConfig.configNames().iterator().forEachRemaining(configNames::add);
-        configNames.addAll(KumuluzEeCustomConfig.getCustomConfigs());
-
-        return ConfigLoader.getConfig(configNames,
-                CONFIG_PREFIX + "." + configName,
-                overrides);
+    @Override
+    public void configure(Map<String, ?> configs, boolean isKey) {
+        this.objectMapper = new ObjectMapper();
     }
 
+    @Override
+    public byte[] serialize(String topic, T data) {
+        try {
+            return objectMapper.writeValueAsBytes(data);
+        } catch (JsonProcessingException e) {
+            throw new SerializationException("Could not serialize to JSON", e);
+        }
+    }
+
+    @Override
+    public void close() {
+
+    }
 }
