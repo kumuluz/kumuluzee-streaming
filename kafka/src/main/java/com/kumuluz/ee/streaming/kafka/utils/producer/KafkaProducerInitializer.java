@@ -53,24 +53,12 @@ public class KafkaProducerInitializer {
         StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
         String config = annotation.config();
 
-        if (producers.containsKey(config)) {
-
-            Producer producer = producers.get(config);
-
-            if (producer != null)
-                return producer;
-
-        } else {
+        if (!producers.containsKey(config)) {
             Producer producer = kafkaProducerFactory.createProducer(KafkaProducerConfigLoader.getConfig(config,
                     annotation.configOverrides()));
             producers.put(config, producer);
-
-            if (producer != null)
-                return producer;
-
         }
 
-        return null;
-
+        return producers.get(config);
     }
 }
