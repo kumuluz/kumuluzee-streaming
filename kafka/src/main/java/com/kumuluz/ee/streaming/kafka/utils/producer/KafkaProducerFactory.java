@@ -21,12 +21,15 @@
 
 package com.kumuluz.ee.streaming.kafka.utils.producer;
 
+import com.kumuluz.ee.streaming.common.annotations.StreamProducer;
 import com.kumuluz.ee.streaming.common.utils.ProducerFactory;
+import com.kumuluz.ee.streaming.kafka.config.KafkaProducerConfigLoader;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.config.ConfigException;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.spi.InjectionPoint;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -36,10 +39,30 @@ import java.util.logging.Logger;
  * @author Matija Kljun
  * @since 1.0.0
  */
-@ApplicationScoped
 public class KafkaProducerFactory implements ProducerFactory<Producer> {
 
-    private static final Logger log = Logger.getLogger(KafkaProducerFactory.class.getName());
+    private static final Logger LOG = Logger.getLogger(KafkaProducerFactory.class.getName());
+
+    private static KafkaProducerFactory instance;
+
+    private Map<String, Producer> producers = new HashMap<>();
+
+    private static synchronized void init() {
+        if (instance == null) {
+            instance = new KafkaProducerFactory();
+        }
+    }
+
+    public static KafkaProducerFactory getInstance() {
+        if (instance == null) {
+            init();
+        }
+
+        return instance;
+    }
+
+    private KafkaProducerFactory() {
+    }
 
     @Override
     public Producer createProducer(Map<String, Object> producerConfig) {
@@ -48,12 +71,25 @@ public class KafkaProducerFactory implements ProducerFactory<Producer> {
 
         try {
             producer = new KafkaProducer(producerConfig);
-            log.info("Created Kafka Producer.");
+            LOG.info("Created Kafka Producer.");
         } catch (ConfigException e) {
-            log.severe("Producer config exception: " + e.toString());
+            LOG.severe("Producer config exception: " + e.toString());
         }
 
         return producer;
     }
 
+    public Producer getProducer(InjectionPoint injectionPoint) {
+
+        StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
+        String config = annotation.config();
+
+        if (!producers.containsKey(config)) {
+            Producer producer = createProducer(KafkaProducerConfigLoader.getConfig(config,
+                    annotation.configOverrides()));
+            producers.put(config, producer);
+        }
+
+        return producers.get(config);
+    }
 }

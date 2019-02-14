@@ -1,2 +1,3 @@
 com.kumuluz.ee.streaming.kafka.utils.consumer.KafkaConsumerInitializerExtension
 com.kumuluz.ee.streaming.kafka.utils.streams.KafkaStreamsInitializerExtension
+com.kumuluz.ee.streaming.kafka.utils.cdi.KafkaProducerCdiExtension

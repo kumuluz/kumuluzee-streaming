@@ -22,15 +22,11 @@
 package com.kumuluz.ee.streaming.kafka.utils.producer;
 
 import com.kumuluz.ee.streaming.common.annotations.StreamProducer;
-import com.kumuluz.ee.streaming.kafka.config.KafkaProducerConfigLoader;
 import org.apache.kafka.clients.producer.Producer;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Producer for KafkaProducer annotation.
@@ -38,27 +34,14 @@ import java.util.Map;
  * @author Matija Kljun
  * @since 1.0.0
  */
-@ApplicationScoped
+@Dependent
 public class KafkaProducerInitializer {
 
-    private Map<String, Producer> producers = new HashMap<>();
-
-    @Inject
-    private KafkaProducerFactory kafkaProducerFactory;
+    public static final String PRODUCER_METHOD_NAME = "getProducer";
 
     @Produces
     @StreamProducer
-    public Producer getProducer(InjectionPoint injectionPoint) {
-
-        StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
-        String config = annotation.config();
-
-        if (!producers.containsKey(config)) {
-            Producer producer = kafkaProducerFactory.createProducer(KafkaProducerConfigLoader.getConfig(config,
-                    annotation.configOverrides()));
-            producers.put(config, producer);
-        }
-
-        return producers.get(config);
+    public static Producer getProducer(InjectionPoint injectionPoint) {
+        return KafkaProducerFactory.getInstance().getProducer(injectionPoint);
     }
 }
