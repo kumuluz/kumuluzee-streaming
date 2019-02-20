@@ -69,8 +69,8 @@ public class KafkaConsumerInitializerExtension implements ConsumerInitializerExt
                 Object instance = bm.getReference(inst.getBean(), method.getDeclaringClass(), bm
                         .createCreationalContext(inst.getBean()));
 
-                ConsumerRunnable consumer = kafkaConsumerFactory.createConsumer(instance, configName, groupId, topics, method,
-                        batchListener, null, annotation.configOverrides());
+                ConsumerRunnable consumer = kafkaConsumerFactory.createConsumer(instance, configName, groupId, topics,
+                        method, batchListener, null, annotation.configOverrides(), adv);
 
                 if (consumer != null) {
                     executor.submit(consumer);

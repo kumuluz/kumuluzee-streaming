@@ -28,6 +28,8 @@ import com.kumuluz.ee.streaming.kafka.utils.ValidationUtils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.DeploymentException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -56,7 +58,7 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
                                            Method method,
                                            boolean batchListener,
                                            Class<?> listenerClass,
-                                           ConfigurationOverride[] overrides) {
+                                           ConfigurationOverride[] overrides, AfterDeploymentValidation adv) {
 
         if (topics.length == 0) {
             topics = new String[1];
@@ -113,14 +115,20 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
             return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener,
                     listenerClass);
         } else {
-            log.severe("Configuration for StreamListener " + method.getDeclaringClass().getName() + "#" +
-                    method.getName() + " is incorrect. Listener will not be initialized.");
+            adv.addDeploymentProblem(new DeploymentException("Configuration for StreamListener " + method.getDeclaringClass().getName() +
+                    "#" + method.getName() + " is incorrect."));
             return null;
         }
     }
 
     private boolean validateConsumerRecord(Type consumerRecord, Map<String, Object> consumerConfig) {
         if (consumerRecord instanceof ParameterizedType) {
+
+            if (!((Class<?>)((ParameterizedType) consumerRecord).getRawType()).isAssignableFrom(ConsumerRecord.class)) {
+                log.severe("Parameter class is not ConsumerRecord.");
+                return false;
+            }
+
             Type keyType = ((ParameterizedType) consumerRecord).getActualTypeArguments()[0];
             Type valueType = ((ParameterizedType) consumerRecord).getActualTypeArguments()[1];
 
@@ -161,6 +169,9 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
             }
 
             return true;
+        } else if (!((Class<?>)consumerRecord).isAssignableFrom(ConsumerRecord.class)) {
+            log.severe("Parameter class is not ConsumerRecord.");
+            return false;
         } else {
             log.warning("StreamListener ConsumerRecord is not generic. Type safety cannot be ensured.");
             return true;
