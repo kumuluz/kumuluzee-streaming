@@ -24,12 +24,18 @@ package com.kumuluz.ee.streaming.kafka.utils.consumer;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.utils.ConsumerFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaConsumerConfigLoader;
+import com.kumuluz.ee.streaming.kafka.utils.ValidationUtils;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -63,26 +69,101 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
             consumerConfig.put("group.id", groupId);
         }
 
-        if (batchListener && !method.getParameterTypes()[0].isAssignableFrom(List.class)) {
+        boolean configurationCorrect = true;
+        if (batchListener) {
 
-            log.warning("Incorrect StreamListener method parameters, if batchListener is set to true the " +
-                    "method expects a List of CosnumerRecord objects.");
-
-        } else if (!batchListener && !method.getParameterTypes()[0].isAssignableFrom(ConsumerRecord.class)) {
-
-            log.warning("Incorrect StreamListener method parameters, if batchListener is set to false " +
-                    "(default) the method expects a CosnumerRecord parameter.");
-
-        } else if (consumerConfig.get("enable.auto.commit") != null && consumerConfig.get("enable.auto.commit").equals("true") && method.getParameterCount() > 1) {
-
-            log.warning("Incorrect StreamListener method parameters, if the enable-auto-commit is set to true," +
-                    " there is no need for Acknowledgement parameter.");
-
+            if (!method.getParameterTypes()[0].isAssignableFrom(List.class)) {
+                log.severe("Incorrect StreamListener method parameters, if batchListener is set to true the " +
+                        "method expects a List of ConsumerRecord objects.");
+                configurationCorrect = false;
+            } else {
+                if (method.getGenericParameterTypes()[0] instanceof ParameterizedType) {
+                    configurationCorrect = validateConsumerRecord(((ParameterizedType)method
+                            .getGenericParameterTypes()[0]).getActualTypeArguments()[0], consumerConfig);
+                } else {
+                    log.warning("StreamListener List parameter is not generic. Type safety cannot be ensured.");
+                }
+            }
         } else {
+            // non-batch listener
+            if (!method.getParameterTypes()[0].isAssignableFrom(ConsumerRecord.class)) {
+                log.severe("Incorrect StreamListener method parameters, if batchListener is set to false " +
+                        "(default) the method expects a ConsumerRecord parameter.");
+                configurationCorrect = false;
+            } else {
+                if (method.getGenericParameterTypes()[0] instanceof ParameterizedType) {
+                    configurationCorrect = validateConsumerRecord(method.getGenericParameterTypes()[0], consumerConfig);
+                } else {
+                    log.warning("StreamListener List parameter is not generic. Type safety cannot be ensured.");
+                }
+            }
 
-            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener, listenerClass);
+        }
+        if (consumerConfig.get("enable.auto.commit") != null &&
+                consumerConfig.get("enable.auto.commit").equals("true") &&
+                method.getParameterCount() > 1) {
+
+            log.severe("Incorrect StreamListener method parameters, if the enable-auto-commit is set to true," +
+                    " there is no need for Acknowledgement parameter.");
+            configurationCorrect = false;
+
         }
 
-        return null;
+        if (configurationCorrect) {
+            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener,
+                    listenerClass);
+        } else {
+            log.severe("Configuration for StreamListener " + method.getDeclaringClass().getName() + "#" +
+                    method.getName() + " is incorrect. Listener will not be initialized.");
+            return null;
+        }
+    }
+
+    private boolean validateConsumerRecord(Type consumerRecord, Map<String, Object> consumerConfig) {
+        if (consumerRecord instanceof ParameterizedType) {
+            Type keyType = ((ParameterizedType) consumerRecord).getActualTypeArguments()[0];
+            Type valueType = ((ParameterizedType) consumerRecord).getActualTypeArguments()[1];
+
+            // get serializer classes from config
+            String keyTypeConfig = (String) consumerConfig.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG);
+            String valueTypeConfig = (String) consumerConfig.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG);
+
+            if (keyTypeConfig == null) {
+                log.severe("Key deserializer is not specified in the consumer configuration.");
+                return false;
+            }
+            if (valueTypeConfig == null) {
+                log.severe("Value deserializer is not specified in the consumer configuration.");
+                return false;
+            }
+
+            try {
+                Class keySerializer = Class.forName(keyTypeConfig);
+                Type t = ValidationUtils.getSerializerType(keySerializer, false);
+
+                if (!(t instanceof TypeVariable) && !((Class<?>)keyType).isAssignableFrom((Class<?>) t)) {
+                    log.severe("Key serializer type does not match the StreamListener parameter type.");
+                    return false;
+                }
+            } catch (ClassNotFoundException e) {
+                log.log(Level.SEVERE, "Key serializer class cannot be found.", e);
+            }
+            try {
+                Class valueSerializer = Class.forName(valueTypeConfig);
+                Type t = ValidationUtils.getSerializerType(valueSerializer, false);
+
+                if (!(t instanceof TypeVariable) && !((Class<?>)valueType).isAssignableFrom((Class<?>) t)) {
+                    log.severe("Value serializer type does not match the StreamListener parameter type.");
+                    return false;
+                }
+            } catch (ClassNotFoundException e) {
+                log.log(Level.SEVERE, "Value serializer class cannot be found.", e);
+            }
+
+            return true;
+        } else {
+            log.warning("StreamListener ConsumerRecord is not generic. Type safety cannot be ensured.");
+            return true;
+        }
     }
 }

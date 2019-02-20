@@ -22,10 +22,10 @@ package com.kumuluz.ee.streaming.kafka.utils.cdi;
 
 import com.kumuluz.ee.streaming.common.annotations.StreamProducer;
 import com.kumuluz.ee.streaming.kafka.config.KafkaProducerConfigLoader;
+import com.kumuluz.ee.streaming.kafka.utils.ValidationUtils;
 import com.kumuluz.ee.streaming.kafka.utils.producer.KafkaProducerInitializer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.Serializer;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.*;
@@ -105,7 +105,7 @@ public class KafkaProducerCdiExtension implements Extension {
                     Class keySerializer = Class.forName(keyType);
 
                     // get type of the serializer
-                    Type t = getSerializerType(keySerializer);
+                    Type t = ValidationUtils.getSerializerType(keySerializer, true);
 
                     // if not generic type and injection type not assignable from serializer type -> error
                     if (!(t instanceof TypeVariable) && !injectionKeyType.isAssignableFrom((Class<?>) t)) {
@@ -121,7 +121,7 @@ public class KafkaProducerCdiExtension implements Extension {
                 try {
                     Class valueSerializer = Class.forName(valueType);
 
-                    Type t = getSerializerType(valueSerializer);
+                    Type t = ValidationUtils.getSerializerType(valueSerializer, true);
 
                     if (!(t instanceof TypeVariable) && !injectionValueType.isAssignableFrom((Class<?>) t)) {
                         pip.addDefinitionError(new DeploymentException("Value serializer for injection point '" + pip.getInjectionPoint() +
@@ -143,29 +143,6 @@ public class KafkaProducerCdiExtension implements Extension {
 
     private boolean isProducer(Type t) {
         return isParameterizedProducer(t) || t.equals(Producer.class);
-    }
-
-    private Type getSerializerType(Class serializer) {
-        if (serializer == null) {
-            throw new IllegalArgumentException("Serializer cannot be null");
-        }
-
-        Type[] interfaces = serializer.getGenericInterfaces();
-        Type serializerType = null;
-
-        for (Type iface : interfaces) {
-            if (iface instanceof ParameterizedType &&
-                    ((ParameterizedType) iface).getRawType().equals(Serializer.class)) {
-                serializerType = ((ParameterizedType) iface).getActualTypeArguments()[0];
-            }
-        }
-
-        if (serializerType == null) {
-            throw new IllegalArgumentException("Serializer does not implement the " + Serializer.class.getName() +
-                    " interface.");
-        }
-
-        return serializerType;
     }
 
     /**
