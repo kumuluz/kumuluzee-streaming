@@ -91,7 +91,7 @@ To use custom prefix, the configuration could look like this:
 kumuluzee:
   streaming:
     kafka:
-      customProducer:
+      custom-producer:
         bootstrap-servers: localhost:9092
         acks: all
         retries: 0
@@ -106,7 +106,7 @@ kumuluzee:
 kumuluzee:
   streaming:
     kafka:
-      customConsumer:
+      custom-consumer:
         bootstrap-servers: localhost:9092
         group-id: group1
         enable-auto-commit: true
@@ -133,23 +133,25 @@ kumuluzee:
 
 For injecting the Kafka `Producer`, the KumuluzEE Kafka provides a `@StreamProducer` annotation, which will inject the
 producer reference. We have to use it in conjunction with the `@Inject` annotation, as shown on the example below.  
-The example bellow shows an example @StreamProducer code excerpt:
+The example bellow shows an example `@StreamProducer` code excerpt:
 
 ```java
 @Inject
 @StreamProducer
-private Producer producer;
+private Producer<String, String> producer;
 ``` 
 
-The annotation has one parameter, which is optional. It is used for assigning the custom producer configuration prefix,
-used in the KumuluzEE configuration. If not specified, the default value is `producer`. The next example shows how to
-specify a custom producer configuration prefix within the annotation:
+The annotation has two parameter, both of which are optional. The `config` parameter is used for assigning the custom
+producer configuration prefix, used in the KumuluzEE configuration. If not specified, the default value is `producer`.
+The next example shows how to specify a custom producer configuration prefix within the annotation:
 
 ```java
 @Inject
-@StreamProducer(config = "customProducer")
-private Producer producer;
-``` 
+@StreamProducer(config = "custom-producer")
+private Producer<String, String> producer;
+```
+
+The second parameter is `configOverrides` and is covered in the section _Overriding configuration_ below.
 
 ### Stream Consumer annotation
 
@@ -158,13 +160,14 @@ used to annotate the method that will be invoked when a message is received. It 
 listener or a MDB. Please pay attention to the fact that you can only use application scoped beans in the
 `@StreamListener` annotated method.
 
-The annotation takes three parameters: 
+The annotation takes four parameters: 
 
 - `topics` an array of topics names, if none is defined the name of the annotated method will be used as a topic name. 
 - `config` is the configuration prefix name for the KumuluzEE configuration. The default value is `consumer`.
 - `batchListener` a boolean value, for enabling batch message consuming. The default value is `false`.
+- `configOverrides` covered in the section _overriding configuration_ below. The default value is empty array (`{}`).
 
-The example shows a @StreamListener annotated topicName method with default configuration prefix name:
+The example shows a `@StreamListener` annotated _topicName_ method with default configuration prefix name:
 
 ```java
 @StreamListener
@@ -173,10 +176,10 @@ public void topicName(ConsumerRecord<String, String> record) {
 }
 ``` 
 
-If you like to add custom configuration prefix name, you can do it like this:
+If you like to add custom configuration prefix name and specify topic names in the annotation, you can do it like this:
 
 ```java
-@StreamListener(topics = {"topic1", "topic2"}, config = "customConsumer")
+@StreamListener(topics = {"topic1", "topic2"}, config = "custom-consumer")
 public void onMessage(ConsumerRecord<String, String> record) {
 	// process the message record
 }
@@ -248,6 +251,17 @@ StreamsController wordCountStreams;
 public void startStream(@Observes @Initialized(ApplicationScoped.class) Object init) {
     wordCountStreams.start();
 }
+```
+
+### Overriding configuration
+
+The annotations `@StreamProducer`, `@StreamListener` and `@StreamProcessor` support the parameter `configOverrides`,
+which enables user to override or supply additional configuration from the code. For example:
+
+```java
+@Inject
+@StreamProducer(configOverrides = {@ConfigurationOverride(key = "bootstrap-servers", value = "localhost:1234")})
+private Producer<String, String> overriddenProducer;
 ```
 
 ## Changelog
