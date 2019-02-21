@@ -28,6 +28,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.config.ConfigException;
 
+import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class KafkaProducerFactory implements ProducerFactory<Producer> {
     private static KafkaProducerFactory instance;
 
     private Map<String, Producer> producers = new HashMap<>();
+    private Map<Annotated, Producer> producersWithConfigOverrides = new HashMap<>();
 
     private static synchronized void init() {
         if (instance == null) {
@@ -84,12 +86,24 @@ public class KafkaProducerFactory implements ProducerFactory<Producer> {
         StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
         String config = annotation.config();
 
-        if (!producers.containsKey(config)) {
-            Producer producer = createProducer(KafkaProducerConfigLoader.getConfig(config,
-                    annotation.configOverrides()));
-            producers.put(config, producer);
-        }
+        if (annotation.configOverrides().length == 0) {
+            // cache by config name if no overrides present
+            if (!producers.containsKey(config)) {
+                Producer producer = createProducer(KafkaProducerConfigLoader.getConfig(config,
+                        annotation.configOverrides()));
+                producers.put(config, producer);
+            }
 
-        return producers.get(config);
+            return producersWithConfigOverrides.get(injectionPoint.getAnnotated());
+        } else {
+            // cache by injection point if overrides present
+            if (!producersWithConfigOverrides.containsKey(injectionPoint.getAnnotated())) {
+                Producer producer = createProducer(KafkaProducerConfigLoader.getConfig(config,
+                        annotation.configOverrides()));
+                producersWithConfigOverrides.put(injectionPoint.getAnnotated(), producer);
+            }
+
+            return producersWithConfigOverrides.get(injectionPoint.getAnnotated());
+        }
     }
 }
