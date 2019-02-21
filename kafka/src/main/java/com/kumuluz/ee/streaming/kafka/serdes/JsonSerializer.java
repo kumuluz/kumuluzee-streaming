@@ -22,6 +22,7 @@ package com.kumuluz.ee.streaming.kafka.serdes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kumuluz.ee.streaming.kafka.utils.KafkaObjectMapperProvider;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
@@ -39,7 +40,7 @@ public class JsonSerializer<T> implements Serializer<T> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = KafkaObjectMapperProvider.getObjectMapper(configs, isKey);
     }
 
     @Override

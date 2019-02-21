@@ -21,6 +21,7 @@
 package com.kumuluz.ee.streaming.kafka.serdes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kumuluz.ee.streaming.kafka.utils.KafkaObjectMapperProvider;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
@@ -44,7 +45,7 @@ public class JsonDeserializer<T> implements Deserializer<T> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        this.objectMapper = new ObjectMapper();
+        this.objectMapper = KafkaObjectMapperProvider.getObjectMapper(configs, isKey);
 
         String fineType = (isKey) ? "key.deserializer.type" : "value.deserializer.type";
 

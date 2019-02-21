@@ -51,22 +51,23 @@ public class JsonSerde<T> implements Serde<T> {
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-        Map<String, String> deserializerConfig = new HashMap<>();
+        Map<String, Object> deserializerConfig = new HashMap<>();
         if (configs.containsKey(KumuluzEeCustomStreamsConfig.DEFAULT_KEY_SERDE_TYPE)) {
             deserializerConfig.put(KumuluzEeCustomConfig.KEY_DESERIALIZER_TYPE,
-                    (String) configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_KEY_SERDE_TYPE));
+                    configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_KEY_SERDE_TYPE));
         }
         if (configs.containsKey(KumuluzEeCustomStreamsConfig.DEFAULT_VALUE_SERDE_TYPE)) {
             deserializerConfig.put(KumuluzEeCustomConfig.VALUE_DESERIALIZER_TYPE,
-                    (String) configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_VALUE_SERDE_TYPE));
+                    configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_VALUE_SERDE_TYPE));
         }
         if (configs.containsKey(KumuluzEeCustomStreamsConfig.DEFAULT_SERDE_TYPE)) {
             deserializerConfig.put(KumuluzEeCustomConfig.DESERIALIZER_TYPE,
-                    (String) configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_SERDE_TYPE));
+                    configs.get(KumuluzEeCustomStreamsConfig.DEFAULT_SERDE_TYPE));
         }
+        deserializerConfig.putAll(configs);
 
         jsonSerializer = new JsonSerializer<>();
-        jsonSerializer.configure(Collections.emptyMap(), isKey);
+        jsonSerializer.configure(configs, isKey);
         jsonDeserializer = new JsonDeserializer<>();
         jsonDeserializer.configure(deserializerConfig, isKey);
     }
