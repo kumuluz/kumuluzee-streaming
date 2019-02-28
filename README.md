@@ -264,6 +264,63 @@ which enables user to override or supply additional configuration from the code.
 private Producer<String, String> overriddenProducer;
 ```
 
+### JSON serializer/deserializer
+
+The KumuluzEE Streaming Kafka library includes convenient JSON serializer/deserializer implementations. The
+implementations are:
+
+- `com.kumuluz.ee.streaming.kafka.serdes.JsonSerializer`
+- `com.kumuluz.ee.streaming.kafka.serdes.JsonDeserializer`
+- `com.kumuluz.ee.streaming.kafka.serdes.JsonSerde`
+
+Example configuration for producer with JSON serializer and consumer with JSON deserializer:
+
+```yaml
+kumuluzee:
+  streaming:
+    kafka:
+      producer:
+        bootstrap-servers: localhost:9092
+        key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
+        value-serializer: com.kumuluz.ee.streaming.kafka.serdes.JsonSerializer
+      consumer:
+        bootstrap-servers: localhost:9092
+        key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
+        value-deserializer: com.kumuluz.ee.streaming.kafka.serdes.JsonDeserializer
+        value-deserializer-type: com.example.test.models.Order
+```
+
+Note that the class that JSON representation should be deserialized into must be provided with the
+`<key/value>-deserializer-type` property.
+
+When using stream processors the JSON SerDe can be programmatically obtained with `KumuluzSerdes.JsonSerde()` method.
+For example:
+
+```java
+Serde<MyModel> myModelSerde = KumuluzSerdes.JsonSerde(MyModel.class);
+```
+
+#### Providing ObjectMapper
+
+JSON serializers/deserializers can use a custom instance of `ObjectMapper` to perform the conversion. In order to supply
+a custom instance implement the `KafkaObjectMapperProvider` interface and register the implementation in a service file.
+For example:
+
+```java
+public class KafkaMapperProvider implements KafkaObjectMapperProvider {
+
+    @Override
+    public ObjectMapper provideObjectMapper(Map<String, ?> configs, boolean isKey) {
+        ObjectMapper om = new ObjectMapper();
+        om.registerModule(new JavaTimeModule());
+        return om;
+    }
+}
+```
+
+Do not forget to register implementation in a service file named
+`com.kumuluz.ee.streaming.kafka.utils.KafkaObjectMapperProvider`.
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-streaming/releases)
