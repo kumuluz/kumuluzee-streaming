@@ -31,7 +31,6 @@ import com.kumuluz.ee.common.dependencies.EeExtensionGroup;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
-import java.util.Optional;
 import java.util.logging.Logger;
 
 /**
@@ -57,13 +56,14 @@ public class KafkaExtension implements Extension {
 
     @Override
     public boolean isEnabled() {
+        return isExtensionEnabled();
+    }
 
-        Optional<Boolean> isEnabled = ConfigurationUtil.getInstance().getBoolean("kumuluzee.streaming.kafka.enabled");
+    public static boolean isExtensionEnabled() {
+        ConfigurationUtil config = ConfigurationUtil.getInstance();
 
-        if (isEnabled.isPresent() && isEnabled.get() == false) {
-            return false;
-        } else {
-            return true;
-        }
+        return config.getBoolean("kumuluzee.streaming.kafka.enabled")
+                .orElse(config.getBoolean("kumuluzee.streaming.enabled")
+                        .orElse(true));
     }
 }

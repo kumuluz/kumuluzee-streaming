@@ -24,6 +24,7 @@ package com.kumuluz.ee.streaming.kafka.utils.producer;
 import com.kumuluz.ee.streaming.common.annotations.StreamProducer;
 import com.kumuluz.ee.streaming.common.utils.ProducerFactory;
 import com.kumuluz.ee.streaming.kafka.config.KafkaProducerConfigLoader;
+import com.kumuluz.ee.streaming.kafka.utils.KafkaExtension;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.config.ConfigException;
@@ -82,6 +83,10 @@ public class KafkaProducerFactory implements ProducerFactory<Producer> {
     }
 
     public Producer getProducer(InjectionPoint injectionPoint) {
+
+        if (!KafkaExtension.isExtensionEnabled()) {
+            return null;
+        }
 
         StreamProducer annotation = injectionPoint.getAnnotated().getAnnotation(StreamProducer.class);
         String config = annotation.config();

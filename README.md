@@ -321,6 +321,12 @@ public class KafkaMapperProvider implements KafkaObjectMapperProvider {
 Do not forget to register implementation in a service file named
 `com.kumuluz.ee.streaming.kafka.utils.KafkaObjectMapperProvider`.
 
+### Disabling extension
+
+The extension can be disabled by setting the `kumuluzee.streaming.kafka.enabled` configuration property to `false`. This
+disables the consumer and stream processor initialization and makes injection of `Producer` and `StreamsController`
+always return `null`.
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-streaming/releases)

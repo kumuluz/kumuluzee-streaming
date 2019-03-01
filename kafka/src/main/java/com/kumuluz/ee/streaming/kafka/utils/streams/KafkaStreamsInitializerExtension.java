@@ -25,6 +25,7 @@ import com.kumuluz.ee.streaming.common.annotations.StreamProcessor;
 import com.kumuluz.ee.streaming.common.annotations.StreamProcessorController;
 import com.kumuluz.ee.streaming.common.utils.AnnotatedInstance;
 import com.kumuluz.ee.streaming.common.utils.StreamsInitializerExtension;
+import com.kumuluz.ee.streaming.kafka.utils.KafkaExtension;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
@@ -94,6 +95,10 @@ public class KafkaStreamsInitializerExtension implements StreamsInitializerExten
 
     @Override
     public <T> void processInjectionTarget(final @Observes ProcessInjectionTarget<T> pit) {
+
+        if (!KafkaExtension.isExtensionEnabled()) {
+            return;
+        }
 
         AnnotatedType<T> at = pit.getAnnotatedType();
 

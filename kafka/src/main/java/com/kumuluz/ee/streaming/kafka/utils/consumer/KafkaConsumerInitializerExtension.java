@@ -25,6 +25,7 @@ import com.kumuluz.ee.streaming.common.annotations.StreamListener;
 import com.kumuluz.ee.streaming.common.utils.AnnotatedInstance;
 import com.kumuluz.ee.streaming.common.utils.ConsumerFactory;
 import com.kumuluz.ee.streaming.common.utils.ConsumerInitializerExtension;
+import com.kumuluz.ee.streaming.kafka.utils.KafkaExtension;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
@@ -46,6 +47,10 @@ public class KafkaConsumerInitializerExtension implements ConsumerInitializerExt
     private static final Logger log = Logger.getLogger(KafkaConsumerInitializerExtension.class.getName());
 
     public void after(@Observes AfterDeploymentValidation adv, BeanManager bm) {
+
+        if (!KafkaExtension.isExtensionEnabled()) {
+            return;
+        }
 
         ConsumerFactory<ConsumerRunnable> kafkaConsumerFactory = new KafkaConsumerFactory();
 
