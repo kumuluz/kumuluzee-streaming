@@ -99,7 +99,7 @@ public class KafkaProducerFactory implements ProducerFactory<Producer> {
                 producers.put(config, producer);
             }
 
-            return producersWithConfigOverrides.get(injectionPoint.getAnnotated());
+            return producers.get(config);
         } else {
             // cache by injection point if overrides present
             if (!producersWithConfigOverrides.containsKey(injectionPoint.getAnnotated())) {
