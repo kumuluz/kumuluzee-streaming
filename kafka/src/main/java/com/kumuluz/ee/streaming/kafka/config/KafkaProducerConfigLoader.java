@@ -21,6 +21,7 @@
 
 package com.kumuluz.ee.streaming.kafka.config;
 
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.config.ConfigLoader;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -40,9 +41,8 @@ public class KafkaProducerConfigLoader {
     private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
 
     public static Map<String, Object> getConfig(String configName, ConfigurationOverride[] overrides) {
-        List<String> configNames = new LinkedList<>();
-        ProducerConfig.configNames().iterator().forEachRemaining(configNames::add);
-        configNames.addAll(KumuluzEeCustomConfig.getCustomConfigs());
+        List<String> configNames = ConfigurationUtil.getInstance().getMapKeys(CONFIG_PREFIX + "." + configName)
+            .orElse(new LinkedList<>());
 
         return ConfigLoader.getConfig(configNames,
                 CONFIG_PREFIX + "." + configName,

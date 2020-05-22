@@ -321,6 +321,34 @@ public class KafkaMapperProvider implements KafkaObjectMapperProvider {
 Do not forget to register implementation in a service file named
 `com.kumuluz.ee.streaming.kafka.utils.KafkaObjectMapperProvider`.
 
+## Schema Registry Support
+You can configure schema registry for Serialization and Deserialization simply by adding the relavant configuration properties to the consumer and producer:
+
+```yaml
+kumuluzee:
+  streaming:
+    kafka:
+      consumer-avro:
+        bootstrap-servers: localhost:29092
+        group-id: group1
+        enable-auto-commit: true
+        auto-offset-reset: latest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        schema-registry-url: http://localhost:8081
+        specific-avro-reader: true
+      producer-avro:
+        bootstrap-servers: localhost:29092
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+        schema-registry-url: http://localhost:8081
+        auto-register-schemas: false
+```
+
+For full sample with Kafka and Schema Registry you should check out [kumuluzee-samples](https://github.com/kumuluz/kumuluzee-samples) repository, module `kumuluzee-streaming-kafka-registry`.
+
+__NOTE: Json Serializer and Deserializer provided by this extension do not support Schema Registry! Use the Confluent or other 3rd party provided SerDes.__
+
 ### Disabling extension
 
 The extension can be disabled by setting the `kumuluzee.streaming.kafka.enabled` configuration property to `false`. This

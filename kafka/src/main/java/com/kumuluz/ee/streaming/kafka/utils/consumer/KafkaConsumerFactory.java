@@ -160,7 +160,9 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
                 Class valueSerializer = Class.forName(valueTypeConfig);
                 Type t = ValidationUtils.getSerializerType(valueSerializer, false);
 
-                if (!(t instanceof TypeVariable) && !((Class<?>)valueType).isAssignableFrom((Class<?>) t)) {
+                //Some Confluent serializers use Object instead of generic T
+                if (!(t instanceof TypeVariable) && !((Class<?>)valueType).isAssignableFrom((Class<?>) t)
+                    && !Object.class.equals(t)) {
                     log.severe("Value serializer type does not match the StreamListener parameter type.");
                     return false;
                 }

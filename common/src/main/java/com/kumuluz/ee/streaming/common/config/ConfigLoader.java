@@ -50,15 +50,15 @@ public class ConfigLoader {
         }
 
         Map<String, Object> prop = new HashMap<>();
-        for (String configProp : configProps) {
+        for (String configPropDashed : configProps) {
             try {
-                String configPropKumuluz = configProp.replace('.', '-');
-                String configName = configPrefix + "." + configPropKumuluz;
+                String configPropDotted = configPropDashed.replace('-', '.');
+                String configName = configPrefix + "." + configPropDashed;
 
-                if (overridesMap.containsKey(configPropKumuluz)) {
-                    prop.put(configProp, overridesMap.get(configPropKumuluz));
+                if (overridesMap.containsKey(configPropDashed)) {
+                    prop.put(configPropDotted, overridesMap.get(configPropDashed));
                 } else if (confUtil.get(configName).isPresent()) {
-                    prop.put(configProp, confUtil.get(configName).get());
+                    prop.put(configPropDotted, confUtil.get(configName).get());
                 }
             } catch (Exception e) {
                 log.severe("Unable to read configuration " + configPrefix + ": " + e.toString());
