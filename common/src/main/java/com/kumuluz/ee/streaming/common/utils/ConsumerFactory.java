@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
  * @since 1.0.0
  */
 public interface ConsumerFactory<T> {
-    T createConsumer(Object instance, String configName, String groupId, String[] topics, Method method,
-                     boolean batchListener, Class<?> clazz, ConfigurationOverride[] overrides,
-                     AfterDeploymentValidation adv);
+
+    T createConsumer(Object instance, String configName, String[] topics, Method method, boolean batchListener,
+                     Class<?> clazz, ConfigurationOverride[] overrides, AfterDeploymentValidation adv);
 }

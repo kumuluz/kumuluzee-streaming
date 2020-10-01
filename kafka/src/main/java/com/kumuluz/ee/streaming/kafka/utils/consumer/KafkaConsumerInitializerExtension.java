@@ -66,15 +66,16 @@ public class KafkaConsumerInitializerExtension implements ConsumerInitializerExt
                 StreamListener annotation = inst.getAnnotation();
                 Method method = inst.getMethod();
 
-                String groupId = annotation.groupId();
-                String[] topics = annotation.topics();
                 String configName = annotation.config();
+                String[] topics = annotation.topics();
                 boolean batchListener = annotation.batchListener();
 
-                Object instance = bm.getReference(inst.getBean(), method.getDeclaringClass(), bm
-                        .createCreationalContext(inst.getBean()));
+                Object instance = bm.getReference(
+                        inst.getBean(), method.getDeclaringClass(),
+                        bm.createCreationalContext(inst.getBean())
+                );
 
-                ConsumerRunnable consumer = kafkaConsumerFactory.createConsumer(instance, configName, groupId, topics,
+                ConsumerRunnable consumer = kafkaConsumerFactory.createConsumer(instance, configName, topics,
                         method, batchListener, null, annotation.configOverrides(), adv);
 
                 if (consumer != null) {

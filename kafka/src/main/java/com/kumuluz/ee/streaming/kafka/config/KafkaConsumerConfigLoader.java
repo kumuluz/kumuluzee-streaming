@@ -24,7 +24,6 @@ package com.kumuluz.ee.streaming.kafka.config;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.config.ConfigLoader;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -41,12 +40,11 @@ public class KafkaConsumerConfigLoader {
     private final static String CONFIG_PREFIX = "kumuluzee.streaming.kafka";
 
     public static Map<String, Object> getConfig(String configName, ConfigurationOverride[] overrides) {
-        List<String> configNames = ConfigurationUtil.getInstance().getMapKeys(CONFIG_PREFIX + "." + configName)
-            .orElse(new LinkedList<>());
+        List<String> configNames = ConfigurationUtil.getInstance()
+                .getMapKeys(CONFIG_PREFIX + "." + configName)
+                .orElse(new LinkedList<>());
 
-        return ConfigLoader.getConfig(configNames,
-                CONFIG_PREFIX + "." + configName,
-                overrides);
+        return ConfigLoader.getConfig(configNames, CONFIG_PREFIX + "." + configName, overrides);
     }
 
 }

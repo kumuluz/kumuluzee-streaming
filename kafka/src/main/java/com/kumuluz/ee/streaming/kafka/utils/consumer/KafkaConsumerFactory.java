@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of consumer factory for Kafka.
@@ -51,24 +52,25 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
     private static final Logger log = Logger.getLogger(KafkaConsumerFactory.class.getName());
 
     @Override
-    public ConsumerRunnable createConsumer(Object instance,
-                                           String configName,
-                                           String groupId,
-                                           String[] topics,
-                                           Method method,
-                                           boolean batchListener,
-                                           Class<?> listenerClass,
+    public ConsumerRunnable createConsumer(Object instance, String configName, String[] topics, Method method,
+                                           boolean batchListener, Class<?> listenerClass,
                                            ConfigurationOverride[] overrides, AfterDeploymentValidation adv) {
-
-        if (topics.length == 0) {
-            topics = new String[1];
-            topics[0] = method.getName();
-        }
 
         Map<String, Object> consumerConfig = KafkaConsumerConfigLoader.getConfig(configName, overrides);
 
-        if(!groupId.equals("")) {
-            consumerConfig.put("group.id", groupId);
+        if (topics.length == 0 && consumerConfig.containsKey("topics")) {
+            String topicsString = (String) consumerConfig.get("topics");
+            if (topicsString != null) {
+                List<String> topicList = Arrays.stream(topicsString.split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList());
+
+                topics = topicList.toArray(new String[] {});
+            }
+        }
+
+        if (topics.length == 0) {
+            topics = new String[] { method.getName() };
         }
 
         boolean configurationCorrect = true;
@@ -112,8 +114,9 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
         }
 
         if (configurationCorrect) {
-            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener,
-                    listenerClass);
+
+
+            return new ConsumerRunnable(instance, consumerConfig, Arrays.asList(topics), method, batchListener, listenerClass);
         } else {
             adv.addDeploymentProblem(new DeploymentException("Configuration for StreamListener " + method.getDeclaringClass().getName() +
                     "#" + method.getName() + " is incorrect."));
@@ -146,7 +149,7 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
             }
 
             try {
-                Class keySerializer = Class.forName(keyTypeConfig);
+                Class<?> keySerializer = Class.forName(keyTypeConfig);
                 Type t = ValidationUtils.getSerializerType(keySerializer, false);
 
                 if (!(t instanceof TypeVariable) && !((Class<?>)keyType).isAssignableFrom((Class<?>) t)) {
@@ -157,7 +160,7 @@ public class KafkaConsumerFactory implements ConsumerFactory<ConsumerRunnable> {
                 log.log(Level.SEVERE, "Key serializer class cannot be found.", e);
             }
             try {
-                Class valueSerializer = Class.forName(valueTypeConfig);
+                Class<?> valueSerializer = Class.forName(valueTypeConfig);
                 Type t = ValidationUtils.getSerializerType(valueSerializer, false);
 
                 //Some Confluent serializers use Object instead of generic T

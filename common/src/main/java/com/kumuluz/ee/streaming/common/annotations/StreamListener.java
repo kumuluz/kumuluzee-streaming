@@ -39,8 +39,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface StreamListener {
 
-    @Nonbinding String groupId() default "";
-
     @Nonbinding String config() default "consumer";
 
     @Nonbinding String[] topics() default {};

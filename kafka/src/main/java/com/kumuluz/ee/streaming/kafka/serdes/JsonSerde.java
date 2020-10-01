@@ -20,8 +20,8 @@
  */
 package com.kumuluz.ee.streaming.kafka.serdes;
 
-import com.kumuluz.ee.streaming.kafka.config.KumuluzEeCustomStreamsConfig;
 import com.kumuluz.ee.streaming.kafka.config.KumuluzEeCustomConfig;
+import com.kumuluz.ee.streaming.kafka.config.KumuluzEeCustomStreamsConfig;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serializer;

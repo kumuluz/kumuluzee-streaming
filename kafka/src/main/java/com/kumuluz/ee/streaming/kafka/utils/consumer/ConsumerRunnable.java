@@ -192,7 +192,7 @@ public class ConsumerRunnable implements Runnable {
                                             nacks.put(tp, record.offset());
                                         }
                                     } else {
-                                        method.invoke(instance, (ConsumerRecord) recordsIterator.next());
+                                        method.invoke(instance, recordsIterator.next());
                                     }
 
                                 } catch (Exception e) {

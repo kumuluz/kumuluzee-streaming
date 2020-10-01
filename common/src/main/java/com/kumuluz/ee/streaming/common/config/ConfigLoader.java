@@ -24,7 +24,10 @@ package com.kumuluz.ee.streaming.common.config;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
@@ -57,8 +60,8 @@ public class ConfigLoader {
 
                 if (overridesMap.containsKey(configPropDashed)) {
                     prop.put(configPropDotted, overridesMap.get(configPropDashed));
-                } else if (confUtil.get(configName).isPresent()) {
-                    prop.put(configPropDotted, confUtil.get(configName).get());
+                } else {
+                    confUtil.get(configName).ifPresent(cv -> prop.put(configPropDotted, cv));
                 }
             } catch (Exception e) {
                 log.severe("Unable to read configuration " + configPrefix + ": " + e.toString());

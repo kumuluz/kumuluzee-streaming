@@ -23,7 +23,6 @@ package com.kumuluz.ee.streaming.kafka.config;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.streaming.common.annotations.ConfigurationOverride;
 import com.kumuluz.ee.streaming.common.config.ConfigLoader;
-import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.LinkedList;
 import java.util.List;
