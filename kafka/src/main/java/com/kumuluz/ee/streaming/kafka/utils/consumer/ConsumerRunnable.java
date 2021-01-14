@@ -150,8 +150,8 @@ public class ConsumerRunnable implements Runnable {
                                         for (TopicPartition tp : maxOffsets.keySet()) {
                                             if (!ackedPartitions.containsKey(tp)) {
                                                 nacks.put(tp, minOffsets.get(tp));
-                                            } else if (ackedPartitions.get(tp) < maxOffsets.get(tp) + 1) {
-                                                nacks.put(tp, ackedPartitions.get(tp) - 1);
+                                            } else if (ackedPartitions.get(tp) < maxOffsets.get(tp)) {
+                                                nacks.put(tp, ackedPartitions.get(tp) + 1);
                                             }
                                         }
                                     }
@@ -207,6 +207,7 @@ public class ConsumerRunnable implements Runnable {
                         for (Map.Entry<TopicPartition, Long> entry : nacks.entrySet()) {
                             consumer.seek(entry.getKey(), entry.getValue());
                         }
+
                         if (!nacks.isEmpty()) {
                             if (retries >= maxRetriesBeforeRebalance) {
                                 log.warning("Max retries reached, trying to rebalance.");
