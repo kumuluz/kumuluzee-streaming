@@ -27,6 +27,9 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: CI debug
+        run: cat ~/.m2/settings.xml || true
+
       - name: Install
         run: mvn --show-version --update-snapshots --batch-mode clean install -DskipTests=true
 
