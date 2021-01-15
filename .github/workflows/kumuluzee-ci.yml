@@ -27,14 +27,11 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: CI debug
-        run: cat ~/.m2/settings.xml || true
-
       - name: Install
-        run: mvn --show-version --update-snapshots --batch-mode clean install -DskipTests=true
+        run: mvn clean install -DskipTests=true -V -U
 
       - name: Test
-        run: mvn --batch-mode test
+        run: mvn test
 
   publish:
     name: Publish to OSSRH
@@ -70,4 +67,4 @@ jobs:
           OSSRH_USERNAME: Kumuluz
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_PASSPHRASE }}
-        run: mvn --batch-mode source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml;
+        run: mvn source:jar javadoc:jar deploy -Pdeploy -DskipTests=true --settings ./settings.xml;
