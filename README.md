@@ -1,5 +1,5 @@
 # KumuluzEE Event Streaming
-[![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-streaming/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-streaming)
+![KumuluzEE CI](https://github.com/kumuluz/kumuluzee-streaming/workflows/KumuluzEE%20CI/badge.svg)
 
 > KumuluzEE Event Streaming project for developing event-based microservices using Apache Kafka.
 
